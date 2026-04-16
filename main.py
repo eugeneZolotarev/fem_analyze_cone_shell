@@ -255,6 +255,37 @@ class Task:
             print(f"Исключение в create_beam_array: {e}")
             return False
 
+    def configure_view(self):
+        """Настраивает визуализацию (скрывает поверхности и включает толщины)."""
+        print("Настройка визуализации вида...")
+
+        # 1. Скрываем поверхности через EntitySetVisibility (Тип 5 = FT_SURFACE)
+        surf_set = self.app.feSet
+        surf_set.AddAll(5)
+        # feEntitySetVisibility(type, setID, bIsVisible, bRedraw)
+        self.app.feEntitySetVisibility(5, surf_set.ID, False, True)
+
+        # 2. Перебираем все виды
+        view_obj = self.app.feView
+        view_obj.Reset
+
+        while True:
+            has_v = view_obj.Next
+            if not has_v: break
+
+            vid = view_obj.ID
+            # Индекс 12 = Element Orientation/Shape
+            # Значение 3 = Show Cross Section (включает сечения и толщины)
+            labels = list(view_obj.vLabel)
+            labels[12] = 3
+            view_obj.vLabel = labels
+            
+            view_obj.Put(vid)
+            print(f"Вид ID {vid} настроен (Cross Section включен).")
+
+        self.app.feViewRegenerate(0)
+        return True
+
     def save_active(self):
         try:
             self.app.feFileSaveAs(0, self.file_path)
@@ -303,6 +334,7 @@ def run_automation(config_path):
                         if s_count > 1:
                             task.create_beam_array(s_count)
             
+            task.configure_view()
             task.save_active()
 
 if __name__ == "__main__":
