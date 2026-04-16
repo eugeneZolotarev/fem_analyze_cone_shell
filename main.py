@@ -32,6 +32,8 @@ class Task:
         self.file_path = os.path.abspath(file_path).replace("/", "\\")
         self._create_new_model()
         self.id_generatrix_cone = -1
+        self._center_bottom_rbe2_node = -1
+        self._center_top_rbe2_node = -1
 
     def _create_new_model(self):
         print(f"--- Модель: {os.path.basename(self.file_path)} ---")
@@ -255,6 +257,67 @@ class Task:
             print(f"Исключение в create_beam_array: {e}")
             return False
 
+    def create_rigid_elements(self):
+        """Создает 2 RBE2 элемента: один для нижнего торца и один для верхнего."""
+        print("Создание жестких элементов (RBE2)...")
+
+        import Pyfemap
+        try:
+            # Передаем сырой COM-указатель внутрь класса Pyfemap
+            nd = Pyfemap.INode(self.app.feNode._oleobj_)
+            rc, numNode, entID, xyz = nd.GetCoordArray(0)
+
+            if rc == -1:
+                # Генератор словаря: {ID_узла: (X, Y, Z)}
+                nodes_dict = {
+                    entID[i]: (xyz[3 * i], xyz[3 * i + 1], xyz[3 * i + 2])
+                    for i in range(numNode)
+                }
+
+                z_min = min(coords[2] for coords in nodes_dict.values())
+                z_max = max(coords[2] for coords in nodes_dict.values())
+                nodes_bottom_cone = dict(filter(lambda element: abs(element[1][2] - z_min) < 1e-7, nodes_dict.items()))
+                nodes_top_cone = dict(filter(lambda element: abs(element[1][2] - z_max) < 1e-7, nodes_dict.items()))
+
+                # 3. Создаем независимые узлы в центрах
+                node_obj = self.app.feNode
+                self._center_bottom_rbe2_node = node_obj.NextEmptyID
+                node_obj.x, node_obj.y, node_obj.z = 0.0, 0.0, z_min
+                node_obj.Put(self._center_bottom_rbe2_node)
+
+                self._center_top_rbe2_node = node_obj.NextEmptyID
+                node_obj.x, node_obj.y, node_obj.z = 0.0, 0.0, z_max
+                node_obj.Put(self._center_top_rbe2_node)
+
+                # 4. Создаем два RBE2 элемента
+                for center_id, dep_nodes, label in [
+                    (self._center_bottom_rbe2_node, list(nodes_bottom_cone.keys()), "Нижний"),
+                    (self._center_top_rbe2_node, list(nodes_top_cone.keys()), "Верхний")
+                ]:
+                    if not dep_nodes: continue
+
+                    elem = self.app.feElem
+                    el_id = elem.NextEmptyID
+                    elem.type = 29      # Rigid
+                    elem.topology = 13  # RigidList
+
+                    # Устанавливаем независимый узел
+                    nodes = list(elem.vnode)
+                    nodes[0] = center_id
+                    elem.vnode = nodes
+
+                    n_count = len(dep_nodes)
+                    # 63 = все 6 DOF для каждого зависимого узла
+                    elem.PutNodeList(0, n_count, dep_nodes, [0]*n_count, [1.0]*n_count, [63]*n_count)
+                    elem.Put(el_id)
+                    print(f"RBE2 {label} (ID {el_id}) создан: {n_count} зависимых узлов.")
+
+                return True
+            return False
+
+        except Exception as e:
+            return False
+
     def configure_view(self):
         """Настраивает визуализацию (скрывает поверхности и включает толщины)."""
         print("Настройка визуализации вида...")
@@ -333,6 +396,9 @@ def run_automation(config_path):
                         s_count = mesh_data.get("stringers_count", 0)
                         if s_count > 1:
                             task.create_beam_array(s_count)
+                
+                # Создаем RBE2 элементы
+                task.create_rigid_elements()
             
             task.configure_view()
             task.save_active()
