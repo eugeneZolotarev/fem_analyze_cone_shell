@@ -33,7 +33,7 @@
   "mesh": {
     "divisions_circular": 60,
     "divisions_height": 10,
-    "stringers_count": 8
+    "stringers_count": 12
   },
   "loads": {
     "axial_force": -1000.0

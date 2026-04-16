@@ -378,6 +378,27 @@ class Task:
             print(f"Ошибка при приложении закреплений. Код: {rc}")
             return False
 
+    def merge_nodes(self, tolerance=1e-6):
+        """Сшивает совпадающие узлы во всей модели."""
+        print(f"Сшивка совпадающих узлов (допуск {tolerance})...")
+        
+        # 1. Собираем все узлы модели (7 = FT_NODE)
+        node_set = self.app.feSet
+        node_set.AddAll(7)
+        
+        # 2. Вызываем метод сшивки
+        # feCheckCoincidentNode2(setID, tolerance, bMerge, mergeMode, mergeLoc, bAcrossConn, messageMode, bSaveGroups)
+        # mergeMode: 1 = Keep Lower ID
+        # mergeLoc: 1 = Keep Lower ID Location
+        rc = self.app.feCheckCoincidentNode2(node_set.ID, tolerance, True, 1, 1, True, 1, False)
+        
+        if rc == -1:
+            print("Сшивка узлов успешно завершена.")
+            return True
+        else:
+            print(f"Предупреждение: Метод сшивки вернул код {rc}")
+            return False
+
     def configure_view(self):
         """Настраивает визуализацию."""
         print("Настройка визуализации вида...")
@@ -440,6 +461,9 @@ def run_automation(config_path):
                         s_count = mesh_data.get("stringers_count", 0)
                         if s_count > 1:
                             task.create_beam_array(s_count)
+                
+                # Сшиваем узлы перед созданием RBE2
+                task.merge_nodes()
                 
                 if task.create_rigid_elements():
                     if load_data and "axial_force" in load_data:
