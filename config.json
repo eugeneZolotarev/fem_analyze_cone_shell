@@ -35,6 +35,9 @@
     "divisions_height": 10,
     "stringers_count": 8
   },
+  "loads": {
+    "axial_force": -1000.0
+  },
   "tasks": [
     {
       "file_name": "cone_mapped_mesh.modfem"

@@ -166,7 +166,7 @@ class Task:
             return False
 
     def create_beams_on_generatrix(self, beam_prop_id, beam_height, plate_thickness, beam_width, beam_thickness):
-        """Создает балочные элементы с заданным смещением (offset)."""
+        """Создает балочные элементы with offset."""
         if self.id_generatrix_cone <= 0: return False
             
         print(f"Создание балок со смещением на образующей {self.id_generatrix_cone}...")
@@ -182,16 +182,14 @@ class Task:
         rc = self.app.feMeshCurve2(-self.id_generatrix_cone, 5, beam_prop_id, True, 0, orient_vec)
 
         if rc == -1:
-            # 2. Собираем элементы на кривой (Rule 43 = FGD_Elem_atCurve)
+            # 2. Собираем элементы на кривой
             elem_set = self.app.feSet
             elem_set.AddRule(self.id_generatrix_cone, 43)
             
-            # Проверяем количество элементов
             try: e_count = elem_set.Count()
             except: e_count = elem_set.Count
             print(f"Найдено балок для настройки: {e_count}")
 
-            # Расчет смещения
             tangens_vector = np.array([p1.x - p2.x, p1.y - p2.y, p1.z - p2.z])
             vecY = np.array([0.0, 1.0, 0.0])
             vecDir = np.cross(tangens_vector, vecY)
@@ -216,21 +214,18 @@ class Task:
         return True
 
     def create_beam_array(self, stringers_count):
-        """Создает круговой массив балок вокруг оси Z."""
+        """Создает круговой массив балок."""
         if self.id_generatrix_cone <= 0 or stringers_count <= 1: 
             return False
             
         print(f"Создание кругового массива балок ({stringers_count} шт.)...")
         try:
-            # 1. Считаем элементы ДО (используем проверенный CountSet)
             try: count_before = self.app.feElem.CountSet()
             except: count_before = self.app.feElem.CountSet
             
-            # 2. Получаем балки на образующей (Rule 43 = FGD_Elem_atCurve)
             elem_set = self.app.feSet
             elem_set.AddRule(self.id_generatrix_cone, 43)
             
-            # 3. Настраиваем и запускаем CopyTool
             copy_tool = self.app.feCopyTool
             copy_tool.Repetitions = int(stringers_count) - 1
             
@@ -238,10 +233,8 @@ class Task:
             direction = [0.0, 0.0, 1.0]
             angle = 360.0 / float(stringers_count)
             
-            # 8 = FT_ELEM
             rc = copy_tool.RotateAroundVector(8, elem_set.ID, base, direction, angle, 0.0)
             
-            # 4. Считаем элементы ПОСЛЕ
             try: count_after = self.app.feElem.CountSet()
             except: count_after = self.app.feElem.CountSet
             
@@ -318,34 +311,88 @@ class Task:
         except Exception as e:
             return False
 
-    def configure_view(self):
-        """Настраивает визуализацию (скрывает поверхности и включает толщины)."""
-        print("Настройка визуализации вида...")
+    def apply_axial_load(self, force_value):
+        """Прикладывает осевую нагрузку к верхнему центральному узлу RBE2."""
+        if self._center_top_rbe2_node <= 0:
+            print("ОШИБКА: Верхний центральный узел не найден.")
+            return False
+            
+        print(f"Приложение осевой нагрузки {force_value} к узлу {self._center_top_rbe2_node}...")
 
-        # 1. Скрываем поверхности через EntitySetVisibility (Тип 5 = FT_SURFACE)
+        # 1. Создаем или получаем активный набор нагрузок (Load Set)
+        ls = self.app.feLoadSet
+        ls_id = ls.NextEmptyID
+        ls.title = "Мой набор нагрузок"
+        ls.Put(ls_id)
+        # Делаем этот набор активным
+        ls.Active = ls_id
+
+        # 2. Инициализируем объект узловой/элементной нагрузки
+        lm = self.app.feLoadMesh
+        # Привязываем создаваемую нагрузку к ID нашего набора
+        lm.setID = ls_id
+
+        # 3. Подготавливаем аргументы
+        # Константа FLT_NFORCE (сосредоточенная узловая сила) имеет числовое значение 1 [3]
+        load_type = 1
+        csys_id = 0  # Базовая глобальная система координат
+
+        # Массивы должны иметь строго заданную длину, требуемую COM-интерфейсом [4]
+        dof_array = [True, True, True]  # 3 флага (вкл/выкл) для осей X, Y, Z [4]
+        values_array = [0.0, 0.0, force_value, 0.0, 0.0]  # 5 значений: компоненты X, Y, Z и два обязательных нуля [4]
+        func_array = [0, 0, 0, 0, 0]
+
+        # 4. Применяем нагрузку к узлу (ОБРАТИТЕ ВНИМАНИЕ НА МИНУС)
+        rc = lm.Add(-self._center_top_rbe2_node, load_type, csys_id, dof_array, values_array, func_array)
+
+        if rc == -1:  # Константа FE_OK
+            print(f"Нагрузка успешно приложена к узлу {self._center_top_rbe2_node}")
+
+    def apply_constraints(self):
+        """Закрепляет нижний центральный узел RBE2 по всем 6 степеням свободы."""
+        if self._center_bottom_rbe2_node <= 0:
+            print("ОШИБКА: Нижний центральный узел не найден.")
+            return False
+            
+        print(f"Приложение закреплений к нижнему узлу {self._center_bottom_rbe2_node} (6 DOF)...")
+        
+        # 1. Создаем набор закреплений (BC Set)
+        bcs = self.app.feBCSet
+        bcs_id = bcs.NextEmptyID
+        bcs.title = "Fixed Base"
+        bcs.Put(bcs_id)
+        # Делаем этот набор активным
+        bcs.Active = bcs_id
+
+        # 2. Создаем узловое закрепление (feBCNode)
+        bn = self.app.feBCNode
+        bn.setID = bcs_id
+        
+        # Add(-nodeID, DOF1, DOF2, DOF3, DOF4, DOF5, DOF6)
+        rc = bn.Add(-self._center_bottom_rbe2_node, True, True, True, True, True, True)
+        
+        if rc == -1:
+            print("Закрепления успешно приложены.")
+            return True
+        else:
+            print(f"Ошибка при приложении закреплений. Код: {rc}")
+            return False
+
+    def configure_view(self):
+        """Настраивает визуализацию."""
+        print("Настройка визуализации вида...")
         surf_set = self.app.feSet
         surf_set.AddAll(5)
-        # feEntitySetVisibility(type, setID, bIsVisible, bRedraw)
         self.app.feEntitySetVisibility(5, surf_set.ID, False, True)
-
-        # 2. Перебираем все виды
         view_obj = self.app.feView
         view_obj.Reset
-
         while True:
             has_v = view_obj.Next
             if not has_v: break
-
             vid = view_obj.ID
-            # Индекс 12 = Element Orientation/Shape
-            # Значение 3 = Show Cross Section (включает сечения и толщины)
-            labels = list(view_obj.vLabel)
-            labels[12] = 3
-            view_obj.vLabel = labels
-            
+            labels = list(view_obj.vLabel); labels[12] = 3; view_obj.vLabel = labels
             view_obj.Put(vid)
-            print(f"Вид ID {vid} настроен (Cross Section включен).")
-
+            print(f"Вид ID {vid} настроен.")
         self.app.feViewRegenerate(0)
         return True
 
@@ -364,6 +411,7 @@ def run_automation(config_path):
     properties_list = config.get("properties", [])
     geom_data = config.get("geometry")
     mesh_data = config.get("mesh")
+    load_data = config.get("loads")
     
     if config.get("tasks"):
         task_data = config["tasks"][0]
@@ -375,19 +423,15 @@ def run_automation(config_path):
         
         if task.session.is_connected():
             mat_id = task.create_material(global_mat)
-            plate_prop_id = None
-            beam_prop_id = None
+            plate_prop_id, beam_prop_id = None, None
             beam_h, plate_t, beam_w, beam_t_web = 0.0, 0.0, 0.0, 0.0
-
             for p_data in properties_list:
                 p_id = task.create_property(p_data, mat_id)
                 if p_data["type"].lower() == "plate":
                     plate_prop_id, plate_t = p_id, p_data["thickness"]
                 if p_data["type"].lower() == "beam_z":
-                    beam_prop_id = p_id
-                    beam_h = p_data["dimensions"]["h"]
-                    beam_w = p_data["dimensions"]["w_bot"]
-                    beam_t_web = p_data["dimensions"]["t_web"]
+                    beam_prop_id, beam_h = p_id, p_data["dimensions"]["h"]
+                    beam_w, beam_t_web = p_data["dimensions"]["w_bot"], p_data["dimensions"]["t_web"]
 
             if task.create_conical_surface(geom_data):
                 task.mesh_all_surfaces(mesh_data, plate_prop_id)
@@ -397,8 +441,11 @@ def run_automation(config_path):
                         if s_count > 1:
                             task.create_beam_array(s_count)
                 
-                # Создаем RBE2 элементы
-                task.create_rigid_elements()
+                if task.create_rigid_elements():
+                    if load_data and "axial_force" in load_data:
+                        task.apply_axial_load(load_data["axial_force"])
+                    # Применяем закрепления в нижней точке
+                    task.apply_constraints()
             
             task.configure_view()
             task.save_active()
