@@ -255,61 +255,77 @@ class Task:
         print("Создание жестких элементов (RBE2)...")
 
         import Pyfemap
-        try:
-            # Передаем сырой COM-указатель внутрь класса Pyfemap
-            nd = Pyfemap.INode(self.app.feNode._oleobj_)
-            rc, numNode, entID, xyz = nd.GetCoordArray(0)
+        # try:
+        # Передаем сырой COM-указатель внутрь класса Pyfemap
+        nd = Pyfemap.INode(self.app.feNode._oleobj_)
+        rc, numNode, entID, xyz = nd.GetCoordArray(0)
 
-            if rc == -1:
-                # Генератор словаря: {ID_узла: (X, Y, Z)}
-                nodes_dict = {
-                    entID[i]: (xyz[3 * i], xyz[3 * i + 1], xyz[3 * i + 2])
-                    for i in range(numNode)
-                }
+        if rc == -1:
+            # Генератор словаря: {ID_узла: (X, Y, Z)}
+            nodes_dict = {
+                entID[i]: (xyz[3 * i], xyz[3 * i + 1], xyz[3 * i + 2])
+                for i in range(numNode)
+            }
 
-                z_min = min(coords[2] for coords in nodes_dict.values())
-                z_max = max(coords[2] for coords in nodes_dict.values())
-                nodes_bottom_cone = dict(filter(lambda element: abs(element[1][2] - z_min) < 1e-7, nodes_dict.items()))
-                nodes_top_cone = dict(filter(lambda element: abs(element[1][2] - z_max) < 1e-7, nodes_dict.items()))
+            z_min = min(coords[2] for coords in nodes_dict.values())
+            z_max = max(coords[2] for coords in nodes_dict.values())
+            nodes_bottom_cone = dict(filter(lambda element: abs(element[1][2] - z_min) < 1e-7, nodes_dict.items()))
+            nodes_top_cone = dict(filter(lambda element: abs(element[1][2] - z_max) < 1e-7, nodes_dict.items()))
 
-                # 3. Создаем независимые узлы в центрах
-                node_obj = self.app.feNode
-                self._center_bottom_rbe2_node = node_obj.NextEmptyID
-                node_obj.x, node_obj.y, node_obj.z = 0.0, 0.0, z_min
-                node_obj.Put(self._center_bottom_rbe2_node)
+            # 3. Создаем независимые узлы в центрах
+            node_obj = self.app.feNode
+            self._center_bottom_rbe2_node = node_obj.NextEmptyID
+            node_obj.x, node_obj.y, node_obj.z = 0.0, 0.0, z_min
+            node_obj.Put(self._center_bottom_rbe2_node)
 
-                self._center_top_rbe2_node = node_obj.NextEmptyID
-                node_obj.x, node_obj.y, node_obj.z = 0.0, 0.0, z_max
-                node_obj.Put(self._center_top_rbe2_node)
+            self._center_top_rbe2_node = node_obj.NextEmptyID
+            node_obj.x, node_obj.y, node_obj.z = 0.0, 0.0, z_max
+            node_obj.Put(self._center_top_rbe2_node)
 
-                # 4. Создаем два RBE2 элемента
-                for center_id, dep_nodes, label in [
-                    (self._center_bottom_rbe2_node, list(nodes_bottom_cone.keys()), "Нижний"),
-                    (self._center_top_rbe2_node, list(nodes_top_cone.keys()), "Верхний")
-                ]:
-                    if not dep_nodes: continue
+            # 4. Создаем два RBE2 элемента
+            for center_id, dep_nodes, label in [
+                (self._center_bottom_rbe2_node, list(nodes_bottom_cone.keys()), "Нижний"),
+                (self._center_top_rbe2_node, list(nodes_top_cone.keys()), "Верхний")
+            ]:
+                if not dep_nodes: continue
 
-                    elem = self.app.feElem
-                    el_id = elem.NextEmptyID
-                    elem.type = 29      # Rigid
-                    elem.topology = 13  # RigidList
+                elem = self.app.feElem
+                el_id = elem.NextEmptyID
+                elem.type = 29      # Rigid
+                elem.topology = 13  # RigidList
+                elem.RigidInterpolate = False # Гарантируем RBE2
 
-                    # Устанавливаем независимый узел
-                    nodes = list(elem.vnode)
-                    nodes[0] = center_id
-                    elem.vnode = nodes
+                # Устанавливаем независимый узел
+                nodes = list(elem.vnode)
+                nodes[0] = center_id
+                elem.vnode = nodes
 
-                    n_count = len(dep_nodes)
-                    # 63 = все 6 DOF для каждого зависимого узла
-                    elem.PutNodeList(0, n_count, dep_nodes, [0]*n_count, [1.0]*n_count, [63]*n_count)
-                    elem.Put(el_id)
-                    print(f"RBE2 {label} (ID {el_id}) создан: {n_count} зависимых узлов.")
+                # ГЛАВНЫЙ ШАГ: Строгая настройка vrelease (2 строки по 6 элементов)
+                # 1 = Активировать Tx, Ty, Tz, Rx, Ry, Rz
+                correct_vrelease = (
+                    (1, 1, 1, 0, 0, 0),  # Не пытайтесь искать здесь логику DOF
+                    (1, 1, 1, 0, 0, 0)  # Это просто хак выравнивания памяти
+                )
+                elem.vrelease = correct_vrelease
 
-                return True
-            return False
+                n_count = len(dep_nodes)
+                # Массив DOF для зависимых узлов (6 значений на каждый узел)
+                # Именно этот массив включает галочки в интерфейсе для ведомых узлов
+                dofs_full = [1, 1, 1, 1, 1, 1] * n_count
 
-        except Exception as e:
-            return False
+                # Привязываем узлы
+                elem.PutNodeList(0, n_count, dep_nodes, [0]*n_count, [1.0]*n_count, dofs_full)
+
+                # Сохраняем элемент
+                rc = elem.Put(el_id)
+                if rc == -1:
+                    print(f"RBE2 {label} (ID {el_id}) создан: {n_count} узлов (6 DOF Tx-Rz заданы).")
+
+            return True
+        return False
+
+        # except Exception as e:
+        #     return False
 
     def apply_axial_load(self, force_value):
         """Прикладывает осевую нагрузку к верхнему центральному узлу RBE2."""
@@ -319,33 +335,24 @@ class Task:
             
         print(f"Приложение осевой нагрузки {force_value} к узлу {self._center_top_rbe2_node}...")
 
-        # 1. Создаем или получаем активный набор нагрузок (Load Set)
         ls = self.app.feLoadSet
         ls_id = ls.NextEmptyID
         ls.title = "Мой набор нагрузок"
         ls.Put(ls_id)
-        # Делаем этот набор активным
         ls.Active = ls_id
 
-        # 2. Инициализируем объект узловой/элементной нагрузки
         lm = self.app.feLoadMesh
-        # Привязываем создаваемую нагрузку к ID нашего набора
         lm.setID = ls_id
 
-        # 3. Подготавливаем аргументы
-        # Константа FLT_NFORCE (сосредоточенная узловая сила) имеет числовое значение 1 [3]
         load_type = 1
-        csys_id = 0  # Базовая глобальная система координат
-
-        # Массивы должны иметь строго заданную длину, требуемую COM-интерфейсом [4]
-        dof_array = [True, True, True]  # 3 флага (вкл/выкл) для осей X, Y, Z [4]
-        values_array = [0.0, 0.0, force_value, 0.0, 0.0]  # 5 значений: компоненты X, Y, Z и два обязательных нуля [4]
+        csys_id = 0
+        dof_array = [True, True, True]
+        values_array = [0.0, 0.0, force_value, 0.0, 0.0]
         func_array = [0, 0, 0, 0, 0]
 
-        # 4. Применяем нагрузку к узлу (ОБРАТИТЕ ВНИМАНИЕ НА МИНУС)
         rc = lm.Add(-self._center_top_rbe2_node, load_type, csys_id, dof_array, values_array, func_array)
 
-        if rc == -1:  # Константа FE_OK
+        if rc == -1:
             print(f"Нагрузка успешно приложена к узлу {self._center_top_rbe2_node}")
 
     def apply_constraints(self):
@@ -356,19 +363,15 @@ class Task:
             
         print(f"Приложение закреплений к нижнему узлу {self._center_bottom_rbe2_node} (6 DOF)...")
         
-        # 1. Создаем набор закреплений (BC Set)
         bcs = self.app.feBCSet
         bcs_id = bcs.NextEmptyID
         bcs.title = "Fixed Base"
         bcs.Put(bcs_id)
-        # Делаем этот набор активным
         bcs.Active = bcs_id
 
-        # 2. Создаем узловое закрепление (feBCNode)
         bn = self.app.feBCNode
         bn.setID = bcs_id
         
-        # Add(-nodeID, DOF1, DOF2, DOF3, DOF4, DOF5, DOF6)
         rc = bn.Add(-self._center_bottom_rbe2_node, True, True, True, True, True, True)
         
         if rc == -1:
@@ -381,17 +384,9 @@ class Task:
     def merge_nodes(self, tolerance=1e-6):
         """Сшивает совпадающие узлы во всей модели."""
         print(f"Сшивка совпадающих узлов (допуск {tolerance})...")
-        
-        # 1. Собираем все узлы модели (7 = FT_NODE)
         node_set = self.app.feSet
         node_set.AddAll(7)
-        
-        # 2. Вызываем метод сшивки
-        # feCheckCoincidentNode2(setID, tolerance, bMerge, mergeMode, mergeLoc, bAcrossConn, messageMode, bSaveGroups)
-        # mergeMode: 1 = Keep Lower ID
-        # mergeLoc: 1 = Keep Lower ID Location
         rc = self.app.feCheckCoincidentNode2(node_set.ID, tolerance, True, 1, 1, True, 1, False)
-        
         if rc == -1:
             print("Сшивка узлов успешно завершена.")
             return True
