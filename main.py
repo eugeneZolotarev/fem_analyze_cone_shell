@@ -119,8 +119,7 @@ class Task:
             surf_set.AddAll(5)  # FT_SURFACE
 
             surf_obj = self.app.feSurface
-            try: surf_set.Reset()
-            except: _ = surf_set.Reset
+            surf_set.Reset
 
             # Собираем ID поверхностей
             sid_list = []
@@ -324,14 +323,11 @@ class Task:
             return True
         return False
 
-        # except Exception as e:
-        #     return False
-
     def apply_axial_load(self, force_value):
         """Прикладывает осевую нагрузку к верхнему центральному узлу RBE2."""
         if self._center_top_rbe2_node <= 0:
             print("ОШИБКА: Верхний центральный узел не найден.")
-            return False
+            return None
             
         print(f"Приложение осевой нагрузки {force_value} к узлу {self._center_top_rbe2_node}...")
 
@@ -354,12 +350,14 @@ class Task:
 
         if rc == -1:
             print(f"Нагрузка успешно приложена к узлу {self._center_top_rbe2_node}")
+            return ls_id
+        return None
 
     def apply_constraints(self):
         """Закрепляет нижний центральный узел RBE2 по всем 6 степеням свободы."""
         if self._center_bottom_rbe2_node <= 0:
             print("ОШИБКА: Нижний центральный узел не найден.")
-            return False
+            return None
             
         print(f"Приложение закреплений к нижнему узлу {self._center_bottom_rbe2_node} (6 DOF)...")
         
@@ -376,10 +374,66 @@ class Task:
         
         if rc == -1:
             print("Закрепления успешно приложены.")
-            return True
-        else:
-            print(f"Ошибка при приложении закреплений. Код: {rc}")
-            return False
+            return bcs_id
+        return None
+
+    def setup_buckling_analysis(self, load_set_id, constraint_set_id):
+        """Создает и настраивает Analysis Set для расчета на устойчивость (Buckling)."""
+        print("Настройка анализа на устойчивость (Buckling)...")
+        
+        mgr  = self.app.feAnalysisMgr
+        am_id = mgr.NextEmptyID
+        mgr.title = "Buckling Analysis"
+        
+        # 7 = Buckling (устойчивость)
+        mgr.InitAnalysisMgr(36, 7, True)
+        # 1. ОБЯЗАТЕЛЬНО: Включаем запись модальных настроек
+        mgr.NasModeOn = True
+        mgr.NasModeMethod = 6  # 2 = Inverse Power, 6 = Lanczos
+        mgr.NasModeDesiredRoots = 1  # Задаем поиск 10 собственных значений
+        # mgr.NasModeEstRoots = 20    # Оценочное число корней (если требует решатель)
+        # Привязываем граничные условия
+        bc_sets = list(mgr.vBCSet)
+        bc_sets[0] = constraint_set_id
+        bc_sets[2] = load_set_id
+        mgr.vBCSet = tuple(bc_sets)
+        
+        mgr.Put(am_id)
+        print(f"Analysis Set ID {am_id} создан.")
+        return am_id
+
+    def run_analysis(self, am_id):
+        """Запускает расчет и ждет его завершения."""
+        """Запускает расчет с автоматическим подтверждением диалогов."""
+        print(f"Запуск решателя для Analysis Set {am_id}...")
+
+        am = self.app.feAnalysisMgr
+
+        # Включаем автоматическое нажатие "OK/Yes" для всех диалогов и сообщений [2]
+        self.app.DialogAutoSkip = 1  # 1 = Yes/OK
+        self.app.DialogAutoSkipMsg = 1  # 1 = Press First Button (OK)
+
+        try:
+            # Метод Analyze теперь сам "нажмет" ОК в окне создания Scalar Points
+            rc = am.Analyze(am_id)
+
+            if rc == -1:
+                print("Решатель запущен. Ожидание завершения...")
+
+                while self.app.feFileProgramRunning == -1:
+                    time.sleep(1)
+
+                print("Расчет завершен.")
+                return True
+            else:
+                print(f"Ошибка при запуске решателя. Код: {rc}")
+                return False
+
+        finally:
+            # ОБЯЗАТЕЛЬНО: выключаем авто-ответы в блоке finally,
+            # чтобы они сбросились даже в случае падения скрипта [2]
+            self.app.DialogAutoSkip = 0
+            self.app.DialogAutoSkipMsg = 0
 
     def merge_nodes(self, tolerance=1e-6):
         """Сшивает совпадающие узлы во всей модели."""
@@ -457,14 +511,21 @@ def run_automation(config_path):
                         if s_count > 1:
                             task.create_beam_array(s_count)
                 
-                # Сшиваем узлы перед созданием RBE2
                 task.merge_nodes()
                 
                 if task.create_rigid_elements():
+                    load_set_id = None
+                    constraint_set_id = None
+                    
                     if load_data and "axial_force" in load_data:
-                        task.apply_axial_load(load_data["axial_force"])
-                    # Применяем закрепления в нижней точке
-                    task.apply_constraints()
+                        load_set_id = task.apply_axial_load(load_data["axial_force"])
+                    
+                    constraint_set_id = task.apply_constraints()
+                    
+                    # Если есть и нагрузки, и закрепления — запускаем анализ
+                    if load_set_id and constraint_set_id:
+                        am_id = task.setup_buckling_analysis(load_set_id, constraint_set_id)
+                        task.run_analysis(am_id)
             
             task.configure_view()
             task.save_active()
