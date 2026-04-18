@@ -53,6 +53,12 @@ class ModelBuilder(ABC):
     @abstractmethod
     def save_model(self, file_path): pass
 
+    @abstractmethod
+    def close_model(self): pass
+
+    @abstractmethod
+    def delete_model_file(self, file_path): pass
+
 class ConeModelBuilder(ModelBuilder):
     """Строитель модели усеченного конуса со стрингерами."""
     
@@ -418,3 +424,25 @@ class ConeModelBuilder(ModelBuilder):
             self.app.feFileSaveAs(0, file_path.replace("/", "\\"))
             self.app.feAppUpdatePanes(True)
         except: pass
+
+    def close_model(self):
+        """Закрывает текущую модель без сохранения изменений (так как Save уже был)."""
+        print("Закрытие модели Femap...")
+        try:
+            # False = bSaveChanges, позволяет закрыть модель без всплывающего окна
+            self.app.feFileClose(False)
+        except Exception as e:
+            print(f"Предупреждение при закрытии модели: {e}")
+
+    def delete_model_file(self, file_path):
+        """Удаляет файл модели с диска."""
+        print(f"Удаление временного файла: {os.path.basename(file_path)}...")
+        time.sleep(1.0) # Пауза, чтобы ОС успела освободить файл после закрытия Femap
+        try:
+            if os.path.exists(file_path):
+                os.remove(file_path)
+                print("Файл успешно удален.")
+            else:
+                print("Файл не найден, удаление не требуется.")
+        except Exception as e:
+            print(f"Ошибка при удалении файла: {e}")

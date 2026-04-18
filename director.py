@@ -62,5 +62,7 @@ class ModelDirector:
         # 9. Финализация
         self.builder.configure_view()
         self.builder.save_model(output_path)
-        print(f"--- Модель успешно завершена: {os.path.basename(output_path)} ---")
+        self.builder.close_model()
+        self.builder.delete_model_file(output_path)
+        print(f"--- Модель успешно завершена, закрыта и удалена: {os.path.basename(output_path)} ---")
         return True
