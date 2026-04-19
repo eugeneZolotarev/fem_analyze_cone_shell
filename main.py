@@ -1,8 +1,14 @@
 import os
 import json
+import sys
+
+from PySide6.QtWidgets import QApplication
+
 from session import FemapSession
 from builders import ConeModelBuilder
 from director import ModelDirector
+from ui.main_window import RocketApp
+
 
 def run_automation(config_path):
     """Точка входа: инициализация сессии, строителей и запуск задач."""
@@ -49,4 +55,18 @@ def run_automation(config_path):
             print(f"ОШИБКА: Задача {i+1} завершилась неудачно.")
 
 if __name__ == "__main__":
-    run_automation("config.json")
+    app = QApplication(sys.argv)
+
+    # Применение темного стиля (QSS)
+    try:
+        with open("style.qss", "r", encoding="utf-8") as style_file:
+            app.setStyleSheet(style_file.read())
+    except FileNotFoundError:
+        print("Внимание: Файл style.qss не найден.")
+
+    window = RocketApp()
+    window.show()
+
+    # run_automation("config.json")
+
+    sys.exit(app.exec())
