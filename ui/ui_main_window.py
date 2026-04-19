@@ -408,12 +408,6 @@ class Ui_MainWindow(object):
 
         self.verticalLayout_left.addLayout(self.horizontalLayout_buttons)
 
-        self.progressBar = QProgressBar(self.centralwidget)
-        self.progressBar.setObjectName(u"progressBar")
-        self.progressBar.setValue(0)
-
-        self.verticalLayout_left.addWidget(self.progressBar)
-
         self.verticalSpacer = QSpacerItem(20, 40, QSizePolicy.Policy.Minimum, QSizePolicy.Policy.Expanding)
 
         self.verticalLayout_left.addItem(self.verticalSpacer)
@@ -428,6 +422,12 @@ class Ui_MainWindow(object):
 
 
         self.verticalLayout_main.addLayout(self.horizontalLayout_top)
+
+        self.progressBar = QProgressBar(self.centralwidget)
+        self.progressBar.setObjectName(u"progressBar")
+        self.progressBar.setValue(0)
+
+        self.verticalLayout_main.addWidget(self.progressBar)
 
         self.log_output = QTextEdit(self.centralwidget)
         self.log_output.setObjectName(u"log_output")

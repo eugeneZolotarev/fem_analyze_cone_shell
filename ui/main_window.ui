@@ -466,13 +466,6 @@ QTextEdit#log_output {
          </layout>
         </item>
         <item>
-         <widget class="QProgressBar" name="progressBar">
-          <property name="value">
-           <number>0</number>
-          </property>
-         </widget>
-        </item>
-        <item>
          <spacer name="verticalSpacer">
           <property name="orientation">
            <enum>Qt::Vertical</enum>
@@ -491,6 +484,13 @@ QTextEdit#log_output {
        <layout class="QVBoxLayout" name="layout_plot"/>
       </item>
      </layout>
+    </item>
+    <item>
+     <widget class="QProgressBar" name="progressBar">
+      <property name="value">
+       <number>0</number>
+      </property>
+     </widget>
     </item>
     <item>
      <widget class="QTextEdit" name="log_output">

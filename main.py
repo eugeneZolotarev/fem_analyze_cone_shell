@@ -56,17 +56,7 @@ def run_automation(config_path):
 
 if __name__ == "__main__":
     app = QApplication(sys.argv)
-
-    # Применение темного стиля (QSS)
-    try:
-        with open("style.qss", "r", encoding="utf-8") as style_file:
-            app.setStyleSheet(style_file.read())
-    except FileNotFoundError:
-        print("Внимание: Файл style.qss не найден.")
-
     window = RocketApp()
     window.show()
-
     # run_automation("config.json")
-
     sys.exit(app.exec())
