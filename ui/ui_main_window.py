@@ -25,7 +25,8 @@ class Ui_MainWindow(object):
     def setupUi(self, MainWindow):
         if not MainWindow.objectName():
             MainWindow.setObjectName(u"MainWindow")
-        MainWindow.resize(1100, 750)
+        MainWindow.resize(1150, 750)
+        MainWindow.setMinimumSize(QSize(1150, 750))
         MainWindow.setStyleSheet(u"/* =========================================\n"
 "   \u041e\u0411\u0429\u0418\u0419 \u0424\u041e\u041d \u0418 \u0428\u0420\u0418\u0424\u0422\u042b\n"
 "   ========================================= */\n"
@@ -391,13 +392,25 @@ class Ui_MainWindow(object):
 
         self.horizontalLayout_buttons = QHBoxLayout()
         self.horizontalLayout_buttons.setObjectName(u"horizontalLayout_buttons")
+        self.horizontalSpacer = QSpacerItem(40, 20, QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Minimum)
+
+        self.horizontalLayout_buttons.addItem(self.horizontalSpacer)
+
         self.btn_run = QPushButton(self.centralwidget)
         self.btn_run.setObjectName(u"btn_run")
+        sizePolicy = QSizePolicy(QSizePolicy.Policy.Minimum, QSizePolicy.Policy.Minimum)
+        sizePolicy.setHorizontalStretch(0)
+        sizePolicy.setVerticalStretch(0)
+        sizePolicy.setHeightForWidth(self.btn_run.sizePolicy().hasHeightForWidth())
+        self.btn_run.setSizePolicy(sizePolicy)
+        self.btn_run.setMinimumSize(QSize(0, 0))
+        self.btn_run.setMaximumSize(QSize(16777215, 30))
 
         self.horizontalLayout_buttons.addWidget(self.btn_run)
 
         self.btn_stop = QPushButton(self.centralwidget)
         self.btn_stop.setObjectName(u"btn_stop")
+        self.btn_stop.setMaximumSize(QSize(16777215, 30))
 
         self.horizontalLayout_buttons.addWidget(self.btn_stop)
 
@@ -422,7 +435,7 @@ class Ui_MainWindow(object):
 
         self.horizontalLayout_top.addLayout(self.layout_plot)
 
-        self.horizontalLayout_top.setStretch(0, 2)
+        self.horizontalLayout_top.setStretch(0, 1)
         self.horizontalLayout_top.setStretch(1, 1)
 
         self.verticalLayout_main.addLayout(self.horizontalLayout_top)
