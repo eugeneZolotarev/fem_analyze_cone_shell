@@ -7,13 +7,13 @@
     <x>0</x>
     <y>0</y>
     <width>1150</width>
-    <height>750</height>
+    <height>895</height>
    </rect>
   </property>
   <property name="minimumSize">
    <size>
     <width>1150</width>
-    <height>750</height>
+    <height>895</height>
    </size>
   </property>
   <property name="windowTitle">
@@ -214,9 +214,20 @@ QTextEdit#log_output {
     <item>
      <layout class="QHBoxLayout" name="horizontalLayout_top" stretch="1,1">
       <item>
-       <layout class="QVBoxLayout" name="verticalLayout_left">
+       <layout class="QVBoxLayout" name="verticalLayout_left" stretch="1,1,2,1,1,1">
         <item>
          <widget class="QGroupBox" name="group_geometry">
+          <property name="sizePolicy">
+           <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
+            <horstretch>0</horstretch>
+            <verstretch>0</verstretch>
+           </sizepolicy>
+          </property>
+          <property name="styleSheet">
+           <string notr="true">QGroupBox {
+	margin: 0px;
+}</string>
+          </property>
           <property name="title">
            <string>Геометрия усеченного конуса (мм)</string>
           </property>
@@ -276,9 +287,111 @@ QTextEdit#log_output {
          </widget>
         </item>
         <item>
+         <widget class="QGroupBox" name="group_material">
+          <property name="sizePolicy">
+           <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
+            <horstretch>0</horstretch>
+            <verstretch>0</verstretch>
+           </sizepolicy>
+          </property>
+          <property name="styleSheet">
+           <string notr="true">QGroupBox {
+	margin: 0px;
+}</string>
+          </property>
+          <property name="title">
+           <string>Свойства материала</string>
+          </property>
+          <layout class="QFormLayout" name="formLayout_mat">
+           <item row="0" column="0">
+            <widget class="QLabel" name="label_mat_name">
+             <property name="text">
+              <string>Название:</string>
+             </property>
+            </widget>
+           </item>
+           <item row="0" column="1">
+            <widget class="QLineEdit" name="txt_mat_name">
+             <property name="text">
+              <string>Steel_Standard</string>
+             </property>
+            </widget>
+           </item>
+           <item row="1" column="0">
+            <widget class="QLabel" name="label_mat_e">
+             <property name="text">
+              <string>E (МПа):</string>
+             </property>
+            </widget>
+           </item>
+           <item row="1" column="1">
+            <widget class="QDoubleSpinBox" name="sb_mat_e">
+             <property name="decimals">
+              <number>0</number>
+             </property>
+             <property name="maximum">
+              <double>999999999999.000000000000000</double>
+             </property>
+             <property name="value">
+              <double>210000.000000000000000</double>
+             </property>
+            </widget>
+           </item>
+           <item row="2" column="0">
+            <widget class="QLabel" name="label_mat_nu">
+             <property name="text">
+              <string>Коэф. Пуассона:</string>
+             </property>
+            </widget>
+           </item>
+           <item row="2" column="1">
+            <widget class="QDoubleSpinBox" name="sb_mat_nu">
+             <property name="maximum">
+              <double>0.500000000000000</double>
+             </property>
+             <property name="singleStep">
+              <double>0.010000000000000</double>
+             </property>
+             <property name="value">
+              <double>0.300000000000000</double>
+             </property>
+            </widget>
+           </item>
+           <item row="3" column="0">
+            <widget class="QLabel" name="label_mat_yield">
+             <property name="text">
+              <string>Sigma_y (МПа):</string>
+             </property>
+            </widget>
+           </item>
+           <item row="3" column="1">
+            <widget class="QDoubleSpinBox" name="sb_mat_yield">
+             <property name="maximum">
+              <double>1000000.000000000000000</double>
+             </property>
+             <property name="value">
+              <double>250.000000000000000</double>
+             </property>
+            </widget>
+           </item>
+          </layout>
+         </widget>
+        </item>
+        <item>
          <layout class="QHBoxLayout" name="horizontalLayout_ranges">
           <item>
            <widget class="QGroupBox" name="group_skin">
+            <property name="sizePolicy">
+             <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
+              <horstretch>0</horstretch>
+              <verstretch>0</verstretch>
+             </sizepolicy>
+            </property>
+            <property name="styleSheet">
+             <string notr="true">QGroupBox {
+	margin: 0px;
+}</string>
+            </property>
             <property name="title">
              <string>Обшивка (t, мм)</string>
             </property>
@@ -330,6 +443,17 @@ QTextEdit#log_output {
           </item>
           <item>
            <widget class="QGroupBox" name="group_stringers">
+            <property name="sizePolicy">
+             <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
+              <horstretch>0</horstretch>
+              <verstretch>0</verstretch>
+             </sizepolicy>
+            </property>
+            <property name="styleSheet">
+             <string notr="true">QGroupBox {
+	margin: 0px;
+}</string>
+            </property>
             <property name="title">
              <string>Стрингеры (Шт)</string>
             </property>
@@ -389,6 +513,11 @@ QTextEdit#log_output {
         </item>
         <item>
          <widget class="QGroupBox" name="group_assortment">
+          <property name="styleSheet">
+           <string notr="true">QGroupBox {
+	margin: 0px;
+}</string>
+          </property>
           <property name="title">
            <string>Сортамент профилей</string>
           </property>
@@ -504,19 +633,6 @@ QTextEdit#log_output {
            <number>0</number>
           </property>
          </widget>
-        </item>
-        <item>
-         <spacer name="verticalSpacer">
-          <property name="orientation">
-           <enum>Qt::Vertical</enum>
-          </property>
-          <property name="sizeHint" stdset="0">
-           <size>
-            <width>20</width>
-            <height>40</height>
-           </size>
-          </property>
-         </spacer>
         </item>
        </layout>
       </item>

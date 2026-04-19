@@ -17,16 +17,16 @@ from PySide6.QtGui import (QBrush, QColor, QConicalGradient, QCursor,
     QPalette, QPixmap, QRadialGradient, QTransform)
 from PySide6.QtWidgets import (QApplication, QDoubleSpinBox, QFormLayout, QGridLayout,
     QGroupBox, QHBoxLayout, QHeaderView, QLabel,
-    QMainWindow, QProgressBar, QPushButton, QSizePolicy,
-    QSpacerItem, QSpinBox, QTableWidget, QTableWidgetItem,
-    QTextEdit, QVBoxLayout, QWidget)
+    QLineEdit, QMainWindow, QProgressBar, QPushButton,
+    QSizePolicy, QSpacerItem, QSpinBox, QTableWidget,
+    QTableWidgetItem, QTextEdit, QVBoxLayout, QWidget)
 
 class Ui_MainWindow(object):
     def setupUi(self, MainWindow):
         if not MainWindow.objectName():
             MainWindow.setObjectName(u"MainWindow")
-        MainWindow.resize(1150, 750)
-        MainWindow.setMinimumSize(QSize(1150, 750))
+        MainWindow.resize(1150, 895)
+        MainWindow.setMinimumSize(QSize(1150, 895))
         MainWindow.setStyleSheet(u"/* =========================================\n"
 "   \u041e\u0411\u0429\u0418\u0419 \u0424\u041e\u041d \u0418 \u0428\u0420\u0418\u0424\u0422\u042b\n"
 "   ========================================= */\n"
@@ -232,6 +232,14 @@ class Ui_MainWindow(object):
         self.verticalLayout_left.setObjectName(u"verticalLayout_left")
         self.group_geometry = QGroupBox(self.centralwidget)
         self.group_geometry.setObjectName(u"group_geometry")
+        sizePolicy = QSizePolicy(QSizePolicy.Policy.Preferred, QSizePolicy.Policy.Fixed)
+        sizePolicy.setHorizontalStretch(0)
+        sizePolicy.setVerticalStretch(0)
+        sizePolicy.setHeightForWidth(self.group_geometry.sizePolicy().hasHeightForWidth())
+        self.group_geometry.setSizePolicy(sizePolicy)
+        self.group_geometry.setStyleSheet(u"QGroupBox {\n"
+"	margin: 0px;\n"
+"}")
         self.gridLayout_geom = QGridLayout(self.group_geometry)
         self.gridLayout_geom.setObjectName(u"gridLayout_geom")
         self.label_height = QLabel(self.group_geometry)
@@ -273,10 +281,78 @@ class Ui_MainWindow(object):
 
         self.verticalLayout_left.addWidget(self.group_geometry)
 
+        self.group_material = QGroupBox(self.centralwidget)
+        self.group_material.setObjectName(u"group_material")
+        sizePolicy.setHeightForWidth(self.group_material.sizePolicy().hasHeightForWidth())
+        self.group_material.setSizePolicy(sizePolicy)
+        self.group_material.setStyleSheet(u"QGroupBox {\n"
+"	margin: 0px;\n"
+"}")
+        self.formLayout_mat = QFormLayout(self.group_material)
+        self.formLayout_mat.setObjectName(u"formLayout_mat")
+        self.label_mat_name = QLabel(self.group_material)
+        self.label_mat_name.setObjectName(u"label_mat_name")
+
+        self.formLayout_mat.setWidget(0, QFormLayout.ItemRole.LabelRole, self.label_mat_name)
+
+        self.txt_mat_name = QLineEdit(self.group_material)
+        self.txt_mat_name.setObjectName(u"txt_mat_name")
+
+        self.formLayout_mat.setWidget(0, QFormLayout.ItemRole.FieldRole, self.txt_mat_name)
+
+        self.label_mat_e = QLabel(self.group_material)
+        self.label_mat_e.setObjectName(u"label_mat_e")
+
+        self.formLayout_mat.setWidget(1, QFormLayout.ItemRole.LabelRole, self.label_mat_e)
+
+        self.sb_mat_e = QDoubleSpinBox(self.group_material)
+        self.sb_mat_e.setObjectName(u"sb_mat_e")
+        self.sb_mat_e.setDecimals(0)
+        self.sb_mat_e.setMaximum(999999999999.000000000000000)
+        self.sb_mat_e.setValue(210000.000000000000000)
+
+        self.formLayout_mat.setWidget(1, QFormLayout.ItemRole.FieldRole, self.sb_mat_e)
+
+        self.label_mat_nu = QLabel(self.group_material)
+        self.label_mat_nu.setObjectName(u"label_mat_nu")
+
+        self.formLayout_mat.setWidget(2, QFormLayout.ItemRole.LabelRole, self.label_mat_nu)
+
+        self.sb_mat_nu = QDoubleSpinBox(self.group_material)
+        self.sb_mat_nu.setObjectName(u"sb_mat_nu")
+        self.sb_mat_nu.setMaximum(0.500000000000000)
+        self.sb_mat_nu.setSingleStep(0.010000000000000)
+        self.sb_mat_nu.setValue(0.300000000000000)
+
+        self.formLayout_mat.setWidget(2, QFormLayout.ItemRole.FieldRole, self.sb_mat_nu)
+
+        self.label_mat_yield = QLabel(self.group_material)
+        self.label_mat_yield.setObjectName(u"label_mat_yield")
+
+        self.formLayout_mat.setWidget(3, QFormLayout.ItemRole.LabelRole, self.label_mat_yield)
+
+        self.sb_mat_yield = QDoubleSpinBox(self.group_material)
+        self.sb_mat_yield.setObjectName(u"sb_mat_yield")
+        self.sb_mat_yield.setMaximum(1000000.000000000000000)
+        self.sb_mat_yield.setValue(250.000000000000000)
+
+        self.formLayout_mat.setWidget(3, QFormLayout.ItemRole.FieldRole, self.sb_mat_yield)
+
+
+        self.verticalLayout_left.addWidget(self.group_material)
+
         self.horizontalLayout_ranges = QHBoxLayout()
         self.horizontalLayout_ranges.setObjectName(u"horizontalLayout_ranges")
         self.group_skin = QGroupBox(self.centralwidget)
         self.group_skin.setObjectName(u"group_skin")
+        sizePolicy1 = QSizePolicy(QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Fixed)
+        sizePolicy1.setHorizontalStretch(0)
+        sizePolicy1.setVerticalStretch(0)
+        sizePolicy1.setHeightForWidth(self.group_skin.sizePolicy().hasHeightForWidth())
+        self.group_skin.setSizePolicy(sizePolicy1)
+        self.group_skin.setStyleSheet(u"QGroupBox {\n"
+"	margin: 0px;\n"
+"}")
         self.form_skin = QFormLayout(self.group_skin)
         self.form_skin.setObjectName(u"form_skin")
         self.label_t_min = QLabel(self.group_skin)
@@ -317,6 +393,11 @@ class Ui_MainWindow(object):
 
         self.group_stringers = QGroupBox(self.centralwidget)
         self.group_stringers.setObjectName(u"group_stringers")
+        sizePolicy1.setHeightForWidth(self.group_stringers.sizePolicy().hasHeightForWidth())
+        self.group_stringers.setSizePolicy(sizePolicy1)
+        self.group_stringers.setStyleSheet(u"QGroupBox {\n"
+"	margin: 0px;\n"
+"}")
         self.form_stringers = QFormLayout(self.group_stringers)
         self.form_stringers.setObjectName(u"form_stringers")
         self.label_str_min = QLabel(self.group_stringers)
@@ -362,6 +443,9 @@ class Ui_MainWindow(object):
 
         self.group_assortment = QGroupBox(self.centralwidget)
         self.group_assortment.setObjectName(u"group_assortment")
+        self.group_assortment.setStyleSheet(u"QGroupBox {\n"
+"	margin: 0px;\n"
+"}")
         self.verticalLayout_list = QVBoxLayout(self.group_assortment)
         self.verticalLayout_list.setObjectName(u"verticalLayout_list")
         self.table_profiles = QTableWidget(self.group_assortment)
@@ -398,11 +482,11 @@ class Ui_MainWindow(object):
 
         self.btn_run = QPushButton(self.centralwidget)
         self.btn_run.setObjectName(u"btn_run")
-        sizePolicy = QSizePolicy(QSizePolicy.Policy.Minimum, QSizePolicy.Policy.Minimum)
-        sizePolicy.setHorizontalStretch(0)
-        sizePolicy.setVerticalStretch(0)
-        sizePolicy.setHeightForWidth(self.btn_run.sizePolicy().hasHeightForWidth())
-        self.btn_run.setSizePolicy(sizePolicy)
+        sizePolicy2 = QSizePolicy(QSizePolicy.Policy.Minimum, QSizePolicy.Policy.Minimum)
+        sizePolicy2.setHorizontalStretch(0)
+        sizePolicy2.setVerticalStretch(0)
+        sizePolicy2.setHeightForWidth(self.btn_run.sizePolicy().hasHeightForWidth())
+        self.btn_run.setSizePolicy(sizePolicy2)
         self.btn_run.setMinimumSize(QSize(0, 0))
         self.btn_run.setMaximumSize(QSize(16777215, 30))
 
@@ -423,10 +507,12 @@ class Ui_MainWindow(object):
 
         self.verticalLayout_left.addWidget(self.progressBar)
 
-        self.verticalSpacer = QSpacerItem(20, 40, QSizePolicy.Policy.Minimum, QSizePolicy.Policy.Expanding)
-
-        self.verticalLayout_left.addItem(self.verticalSpacer)
-
+        self.verticalLayout_left.setStretch(0, 1)
+        self.verticalLayout_left.setStretch(1, 1)
+        self.verticalLayout_left.setStretch(2, 2)
+        self.verticalLayout_left.setStretch(3, 1)
+        self.verticalLayout_left.setStretch(4, 1)
+        self.verticalLayout_left.setStretch(5, 1)
 
         self.horizontalLayout_top.addLayout(self.verticalLayout_left)
 
@@ -460,6 +546,12 @@ class Ui_MainWindow(object):
         self.label_height.setText(QCoreApplication.translate("MainWindow", u"\u0412\u044b\u0441\u043e\u0442\u0430 (H):", None))
         self.label_d_small.setText(QCoreApplication.translate("MainWindow", u"\u041c\u0430\u043b\u044b\u0439 \u0434\u0438\u0430\u043c. (d):", None))
         self.label_d_large.setText(QCoreApplication.translate("MainWindow", u"\u0411\u043e\u043b\u044c\u0448\u0438\u0439 \u0434\u0438\u0430\u043c. (D):", None))
+        self.group_material.setTitle(QCoreApplication.translate("MainWindow", u"\u0421\u0432\u043e\u0439\u0441\u0442\u0432\u0430 \u043c\u0430\u0442\u0435\u0440\u0438\u0430\u043b\u0430", None))
+        self.label_mat_name.setText(QCoreApplication.translate("MainWindow", u"\u041d\u0430\u0437\u0432\u0430\u043d\u0438\u0435:", None))
+        self.txt_mat_name.setText(QCoreApplication.translate("MainWindow", u"Steel_Standard", None))
+        self.label_mat_e.setText(QCoreApplication.translate("MainWindow", u"E (\u041c\u041f\u0430):", None))
+        self.label_mat_nu.setText(QCoreApplication.translate("MainWindow", u"\u041a\u043e\u044d\u0444. \u041f\u0443\u0430\u0441\u0441\u043e\u043d\u0430:", None))
+        self.label_mat_yield.setText(QCoreApplication.translate("MainWindow", u"Sigma_y (\u041c\u041f\u0430):", None))
         self.group_skin.setTitle(QCoreApplication.translate("MainWindow", u"\u041e\u0431\u0448\u0438\u0432\u043a\u0430 (t, \u043c\u043c)", None))
         self.label_t_min.setText(QCoreApplication.translate("MainWindow", u"\u041c\u0438\u043d:", None))
         self.label_t_max.setText(QCoreApplication.translate("MainWindow", u"\u041c\u0430\u043a\u0441:", None))

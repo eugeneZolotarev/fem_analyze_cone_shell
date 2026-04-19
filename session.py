@@ -1,5 +1,5 @@
 import win32com.client
-from pythoncom import connect
+import pythoncom
 from Pyfemap import model
 
 class FemapSession:
@@ -10,17 +10,26 @@ class FemapSession:
     def __new__(cls):
         if cls._instance is None:
             cls._instance = super(FemapSession, cls).__new__(cls)
-            cls._instance._connect()
         return cls._instance
 
-    def _connect(self):
+    def connect(self):
+        """Инициализация подключения в контексте текущего потока."""
+        if self.app is not None:
+            return self.app
+            
         try:
+            # Инициализируем COM для текущего потока
+            pythoncom.CoInitialize()
+            
             # Подключение к активному экземпляру Femap
+            from pythoncom import connect
             self.app = model(connect("femap.model"))
-            print("Успешное подключение к активному Femap.")
+            print(f"Поток {threading.get_native_id() if 'threading' in globals() else ''}: Успешное подключение к Femap.")
+            return self.app
         except Exception as e:
             print(f"Ошибка подключения к Femap: {e}")
             self.app = None
+            return None
 
     def is_connected(self):
         return self.app is not None
