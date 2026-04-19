@@ -206,7 +206,7 @@ QTextEdit#log_output {
   <widget class="QWidget" name="centralwidget">
    <layout class="QVBoxLayout" name="verticalLayout_main">
     <item>
-     <layout class="QHBoxLayout" name="horizontalLayout_top" stretch="0,0">
+     <layout class="QHBoxLayout" name="horizontalLayout_top" stretch="2,1">
       <item>
        <layout class="QVBoxLayout" name="verticalLayout_left">
         <item>
@@ -421,16 +421,6 @@ QTextEdit#log_output {
              </column>
              <column>
               <property name="text">
-               <string>R, мм</string>
-              </property>
-             </column>
-             <column>
-              <property name="text">
-               <string>r1, мм</string>
-              </property>
-             </column>
-             <column>
-              <property name="text">
                <string>S сечения, мм^2</string>
               </property>
              </column>
@@ -466,6 +456,13 @@ QTextEdit#log_output {
          </layout>
         </item>
         <item>
+         <widget class="QProgressBar" name="progressBar">
+          <property name="value">
+           <number>0</number>
+          </property>
+         </widget>
+        </item>
+        <item>
          <spacer name="verticalSpacer">
           <property name="orientation">
            <enum>Qt::Vertical</enum>
@@ -484,13 +481,6 @@ QTextEdit#log_output {
        <layout class="QVBoxLayout" name="layout_plot"/>
       </item>
      </layout>
-    </item>
-    <item>
-     <widget class="QProgressBar" name="progressBar">
-      <property name="value">
-       <number>0</number>
-      </property>
-     </widget>
     </item>
     <item>
      <widget class="QTextEdit" name="log_output">

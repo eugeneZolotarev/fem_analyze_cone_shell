@@ -364,8 +364,8 @@ class Ui_MainWindow(object):
         self.verticalLayout_list = QVBoxLayout(self.group_assortment)
         self.verticalLayout_list.setObjectName(u"verticalLayout_list")
         self.table_profiles = QTableWidget(self.group_assortment)
-        if (self.table_profiles.columnCount() < 10):
-            self.table_profiles.setColumnCount(10)
+        if (self.table_profiles.columnCount() < 8):
+            self.table_profiles.setColumnCount(8)
         __qtablewidgetitem = QTableWidgetItem()
         self.table_profiles.setHorizontalHeaderItem(0, __qtablewidgetitem)
         __qtablewidgetitem1 = QTableWidgetItem()
@@ -382,10 +382,6 @@ class Ui_MainWindow(object):
         self.table_profiles.setHorizontalHeaderItem(6, __qtablewidgetitem6)
         __qtablewidgetitem7 = QTableWidgetItem()
         self.table_profiles.setHorizontalHeaderItem(7, __qtablewidgetitem7)
-        __qtablewidgetitem8 = QTableWidgetItem()
-        self.table_profiles.setHorizontalHeaderItem(8, __qtablewidgetitem8)
-        __qtablewidgetitem9 = QTableWidgetItem()
-        self.table_profiles.setHorizontalHeaderItem(9, __qtablewidgetitem9)
         self.table_profiles.setObjectName(u"table_profiles")
 
         self.verticalLayout_list.addWidget(self.table_profiles)
@@ -408,6 +404,12 @@ class Ui_MainWindow(object):
 
         self.verticalLayout_left.addLayout(self.horizontalLayout_buttons)
 
+        self.progressBar = QProgressBar(self.centralwidget)
+        self.progressBar.setObjectName(u"progressBar")
+        self.progressBar.setValue(0)
+
+        self.verticalLayout_left.addWidget(self.progressBar)
+
         self.verticalSpacer = QSpacerItem(20, 40, QSizePolicy.Policy.Minimum, QSizePolicy.Policy.Expanding)
 
         self.verticalLayout_left.addItem(self.verticalSpacer)
@@ -420,14 +422,10 @@ class Ui_MainWindow(object):
 
         self.horizontalLayout_top.addLayout(self.layout_plot)
 
+        self.horizontalLayout_top.setStretch(0, 2)
+        self.horizontalLayout_top.setStretch(1, 1)
 
         self.verticalLayout_main.addLayout(self.horizontalLayout_top)
-
-        self.progressBar = QProgressBar(self.centralwidget)
-        self.progressBar.setObjectName(u"progressBar")
-        self.progressBar.setValue(0)
-
-        self.verticalLayout_main.addWidget(self.progressBar)
 
         self.log_output = QTextEdit(self.centralwidget)
         self.log_output.setObjectName(u"log_output")
@@ -471,13 +469,9 @@ class Ui_MainWindow(object):
         ___qtablewidgetitem5 = self.table_profiles.horizontalHeaderItem(5)
         ___qtablewidgetitem5.setText(QCoreApplication.translate("MainWindow", u"S2, \u043c\u043c", None));
         ___qtablewidgetitem6 = self.table_profiles.horizontalHeaderItem(6)
-        ___qtablewidgetitem6.setText(QCoreApplication.translate("MainWindow", u"R, \u043c\u043c", None));
+        ___qtablewidgetitem6.setText(QCoreApplication.translate("MainWindow", u"S \u0441\u0435\u0447\u0435\u043d\u0438\u044f, \u043c\u043c^2", None));
         ___qtablewidgetitem7 = self.table_profiles.horizontalHeaderItem(7)
-        ___qtablewidgetitem7.setText(QCoreApplication.translate("MainWindow", u"r1, \u043c\u043c", None));
-        ___qtablewidgetitem8 = self.table_profiles.horizontalHeaderItem(8)
-        ___qtablewidgetitem8.setText(QCoreApplication.translate("MainWindow", u"S \u0441\u0435\u0447\u0435\u043d\u0438\u044f, \u043c\u043c^2", None));
-        ___qtablewidgetitem9 = self.table_profiles.horizontalHeaderItem(9)
-        ___qtablewidgetitem9.setText(QCoreApplication.translate("MainWindow", u"\u041c\u0430\u0441\u0441\u0430 1 \u043c, \u043a\u0433", None));
+        ___qtablewidgetitem7.setText(QCoreApplication.translate("MainWindow", u"\u041c\u0430\u0441\u0441\u0430 1 \u043c, \u043a\u0433", None));
         self.btn_run.setStyleSheet(QCoreApplication.translate("MainWindow", u"font-weight: bold; height: 40px;", None))
         self.btn_run.setText(QCoreApplication.translate("MainWindow", u"\u0417\u0430\u043f\u0443\u0441\u0442\u0438\u0442\u044c \u043e\u043f\u0442\u0438\u043c\u0438\u0437\u0430\u0446\u0438\u044e", None))
         self.btn_stop.setText(QCoreApplication.translate("MainWindow", u"\u0421\u0442\u043e\u043f", None))
