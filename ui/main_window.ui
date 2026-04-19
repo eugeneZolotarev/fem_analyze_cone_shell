@@ -1,0 +1,516 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>MainWindow</class>
+ <widget class="QMainWindow" name="MainWindow">
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>1100</width>
+    <height>750</height>
+   </rect>
+  </property>
+  <property name="windowTitle">
+   <string>RocketShell Optimizer - Расчет конических отсеков</string>
+  </property>
+  <property name="styleSheet">
+   <string notr="true">/* =========================================
+   ОБЩИЙ ФОН И ШРИФТЫ
+   ========================================= */
+QWidget {
+    background-color: #2b2b2b;
+    color: #e0e0e0;
+    font-family: &quot;Segoe UI&quot;, &quot;Helvetica Neue&quot;, Arial, sans-serif;
+    font-size: 10pt;
+}
+
+/* =========================================
+   ГРУППЫ ПАРАМЕТРОВ (QGroupBox)
+   ========================================= */
+QGroupBox {
+    border: 1px solid #555555;
+    border-radius: 6px;
+    margin-top: 1.2em; /* Отступ сверху, чтобы заголовок не наезжал на рамку */
+    padding-top: 10px;
+}
+
+QGroupBox::title {
+    subcontrol-origin: margin;
+    subcontrol-position: top left;
+    padding: 0 8px;
+    color: #4da6ff; /* Инженерный синий акцент */
+    font-weight: bold;
+}
+
+/* =========================================
+   ПОЛЯ ВВОДА (SpinBoxes)
+   ========================================= */
+QSpinBox, QDoubleSpinBox {
+    background-color: #3c3f41;
+    border: 1px solid #555555;
+    border-radius: 4px;
+    padding: 4px;
+    color: #ffffff;
+    min-width: 60px;
+}
+
+QSpinBox:focus, QDoubleSpinBox:focus {
+    border: 1px solid #4da6ff; /* Синяя подсветка при вводе с клавиатуры */
+    background-color: #45494a;
+}
+
+/* Стилизация стрелочек вверх/вниз */
+QSpinBox::up-button, QDoubleSpinBox::up-button,
+QSpinBox::down-button, QDoubleSpinBox::down-button {
+    background-color: #45494a;
+    border-left: 1px solid #555555;
+    width: 20px;
+}
+
+QSpinBox::up-button:hover, QDoubleSpinBox::up-button:hover,
+QSpinBox::down-button:hover, QDoubleSpinBox::down-button:hover {
+    background-color: #54585a;
+}
+
+/* =========================================
+   ТАБЛИЦА СОРТАМЕНТА (QTableWidget)
+   ========================================= */
+QTableWidget {
+    background-color: #1e1e1e;
+    alternate-background-color: #2a2d2e; /* Цвет для &quot;зебры&quot; (четные строки) */
+    color: #e0e0e0;
+    gridline-color: #3c3f41;
+    border: 1px solid #555555;
+    border-radius: 4px;
+    outline: none; /* Убирает пунктирную рамку фокуса */
+}
+
+QTableWidget::item {
+    padding: 4px;
+}
+
+QTableWidget::item:hover {
+    background-color: #353839; /* Легкая подсветка при наведении */
+}
+
+QTableWidget::item:selected {
+    background-color: #007ACC; /* Глубокий синий при выборе профиля */
+    color: white;
+    font-weight: bold;
+}
+
+/* Заголовки столбцов таблицы */
+QHeaderView::section {
+    background-color: #3c3f41;
+    color: #ffffff;
+    padding: 6px;
+    border: 1px solid #555555;
+    border-top: none;
+    border-left: none;
+    font-weight: bold;
+    font-size: 9pt;
+}
+
+QHeaderView::section:hover {
+    background-color: #54585a;
+}
+
+/* Квадратик в левом верхнем углу таблицы */
+QTableCornerButton::section {
+    background-color: #3c3f41;
+    border: 1px solid #555555;
+}
+
+/* =========================================
+   КНОПКИ (QPushButton)
+   ========================================= */
+QPushButton {
+    background-color: #45494a;
+    border: 1px solid #555555;
+    border-radius: 4px;
+    padding: 8px 15px;
+    color: #e0e0e0;
+}
+
+QPushButton:hover {
+    background-color: #54585a;
+    border: 1px solid #777777;
+}
+
+QPushButton:pressed {
+    background-color: #3c3f41;
+}
+
+/* Спец. стиль для кнопки &quot;Запустить&quot; */
+QPushButton#btn_run {
+    background-color: #2b7041; /* Спокойный зеленый */
+    border: 1px solid #3d9e5a;
+    color: white;
+    font-size: 11pt;
+}
+
+QPushButton#btn_run:hover {
+    background-color: #358c51;
+}
+
+QPushButton#btn_run:pressed {
+    background-color: #1f5230;
+}
+
+/* Спец. стиль для кнопки &quot;Стоп&quot; */
+QPushButton#btn_stop {
+    background-color: #8c3d3d; /* Спокойный красный */
+    border: 1px solid #a64d4d;
+    color: white;
+}
+
+QPushButton#btn_stop:hover {
+    background-color: #a64d4d;
+}
+
+QPushButton#btn_stop:pressed {
+    background-color: #5c2828;
+}
+
+/* =========================================
+   ШКАЛА ПРОГРЕССА (QProgressBar)
+   ========================================= */
+QProgressBar {
+    border: 1px solid #555555;
+    border-radius: 4px;
+    text-align: center;
+    background-color: #1e1e1e;
+    color: white;
+    font-weight: bold;
+    min-height: 20px;
+}
+
+QProgressBar::chunk {
+    background-color: qlineargradient(spread:pad, x1:0, y1:0, x2:1, y2:0, stop:0 #007ACC, stop:1 #4da6ff);
+    border-radius: 3px;
+}
+
+/* =========================================
+   ТЕРМИНАЛ ЛОГОВ (QTextEdit)
+   ========================================= */
+QTextEdit#log_output {
+    background-color: #121212; /* Черный фон как в настоящем терминале */
+    color: #a9b7c6; /* Цвет текста как в IDE */
+    font-family: &quot;Consolas&quot;, &quot;Courier New&quot;, monospace; /* Строго моноширинный шрифт */
+    font-size: 10pt;
+    border: 1px solid #555555;
+    border-radius: 4px;
+    padding: 8px;
+}</string>
+  </property>
+  <widget class="QWidget" name="centralwidget">
+   <layout class="QVBoxLayout" name="verticalLayout_main">
+    <item>
+     <layout class="QHBoxLayout" name="horizontalLayout_top" stretch="0,0">
+      <item>
+       <layout class="QVBoxLayout" name="verticalLayout_left">
+        <item>
+         <widget class="QGroupBox" name="group_geometry">
+          <property name="title">
+           <string>Геометрия усеченного конуса (мм)</string>
+          </property>
+          <layout class="QGridLayout" name="gridLayout_geom">
+           <item row="0" column="0">
+            <widget class="QLabel" name="label_height">
+             <property name="text">
+              <string>Высота (H):</string>
+             </property>
+            </widget>
+           </item>
+           <item row="0" column="1">
+            <widget class="QDoubleSpinBox" name="sb_height">
+             <property name="maximum">
+              <double>10000.000000000000000</double>
+             </property>
+             <property name="value">
+              <double>1036.000000000000000</double>
+             </property>
+            </widget>
+           </item>
+           <item row="1" column="0">
+            <widget class="QLabel" name="label_d_small">
+             <property name="text">
+              <string>Малый диам. (d):</string>
+             </property>
+            </widget>
+           </item>
+           <item row="1" column="1">
+            <widget class="QDoubleSpinBox" name="sb_d_small">
+             <property name="maximum">
+              <double>5000.000000000000000</double>
+             </property>
+             <property name="value">
+              <double>1400.000000000000000</double>
+             </property>
+            </widget>
+           </item>
+           <item row="2" column="0">
+            <widget class="QLabel" name="label_d_large">
+             <property name="text">
+              <string>Больший диам. (D):</string>
+             </property>
+            </widget>
+           </item>
+           <item row="2" column="1">
+            <widget class="QDoubleSpinBox" name="sb_d_large">
+             <property name="maximum">
+              <double>5000.000000000000000</double>
+             </property>
+             <property name="value">
+              <double>1600.000000000000000</double>
+             </property>
+            </widget>
+           </item>
+          </layout>
+         </widget>
+        </item>
+        <item>
+         <layout class="QHBoxLayout" name="horizontalLayout_ranges">
+          <item>
+           <widget class="QGroupBox" name="group_skin">
+            <property name="title">
+             <string>Обшивка (t, мм)</string>
+            </property>
+            <layout class="QFormLayout" name="form_skin">
+             <item row="0" column="0">
+              <widget class="QLabel" name="label_t_min">
+               <property name="text">
+                <string>Мин:</string>
+               </property>
+              </widget>
+             </item>
+             <item row="0" column="1">
+              <widget class="QDoubleSpinBox" name="sb_thick_min">
+               <property name="value">
+                <double>0.500000000000000</double>
+               </property>
+              </widget>
+             </item>
+             <item row="1" column="0">
+              <widget class="QLabel" name="label_t_max">
+               <property name="text">
+                <string>Макс:</string>
+               </property>
+              </widget>
+             </item>
+             <item row="1" column="1">
+              <widget class="QDoubleSpinBox" name="sb_thick_max">
+               <property name="value">
+                <double>2.000000000000000</double>
+               </property>
+              </widget>
+             </item>
+             <item row="2" column="0">
+              <widget class="QLabel" name="label_t_step">
+               <property name="text">
+                <string>Шаг:</string>
+               </property>
+              </widget>
+             </item>
+             <item row="2" column="1">
+              <widget class="QDoubleSpinBox" name="sb_thick_step">
+               <property name="value">
+                <double>0.100000000000000</double>
+               </property>
+              </widget>
+             </item>
+            </layout>
+           </widget>
+          </item>
+          <item>
+           <widget class="QGroupBox" name="group_stringers">
+            <property name="title">
+             <string>Стрингеры (Шт)</string>
+            </property>
+            <layout class="QFormLayout" name="form_stringers">
+             <item row="0" column="0">
+              <widget class="QLabel" name="label_str_min">
+               <property name="text">
+                <string>Мин:</string>
+               </property>
+              </widget>
+             </item>
+             <item row="0" column="1">
+              <widget class="QSpinBox" name="sb_str_min">
+               <property name="maximum">
+                <number>500</number>
+               </property>
+               <property name="value">
+                <number>40</number>
+               </property>
+              </widget>
+             </item>
+             <item row="1" column="0">
+              <widget class="QLabel" name="label_str_max">
+               <property name="text">
+                <string>Макс:</string>
+               </property>
+              </widget>
+             </item>
+             <item row="1" column="1">
+              <widget class="QSpinBox" name="sb_str_max">
+               <property name="maximum">
+                <number>500</number>
+               </property>
+               <property name="value">
+                <number>120</number>
+               </property>
+              </widget>
+             </item>
+             <item row="2" column="0">
+              <widget class="QLabel" name="label_str_step">
+               <property name="text">
+                <string>Шаг:</string>
+               </property>
+              </widget>
+             </item>
+             <item row="2" column="1">
+              <widget class="QSpinBox" name="sb_str_step">
+               <property name="value">
+                <number>10</number>
+               </property>
+              </widget>
+             </item>
+            </layout>
+           </widget>
+          </item>
+         </layout>
+        </item>
+        <item>
+         <widget class="QGroupBox" name="group_assortment">
+          <property name="title">
+           <string>Сортамент профилей</string>
+          </property>
+          <layout class="QVBoxLayout" name="verticalLayout_list">
+           <item>
+            <widget class="QTableWidget" name="table_profiles">
+             <column>
+              <property name="text">
+               <string>№</string>
+              </property>
+             </column>
+             <column>
+              <property name="text">
+               <string>H, мм</string>
+              </property>
+             </column>
+             <column>
+              <property name="text">
+               <string>B, мм</string>
+              </property>
+             </column>
+             <column>
+              <property name="text">
+               <string>S, мм</string>
+              </property>
+             </column>
+             <column>
+              <property name="text">
+               <string>S1, мм</string>
+              </property>
+             </column>
+             <column>
+              <property name="text">
+               <string>S2, мм</string>
+              </property>
+             </column>
+             <column>
+              <property name="text">
+               <string>R, мм</string>
+              </property>
+             </column>
+             <column>
+              <property name="text">
+               <string>r1, мм</string>
+              </property>
+             </column>
+             <column>
+              <property name="text">
+               <string>S сечения, мм^2</string>
+              </property>
+             </column>
+             <column>
+              <property name="text">
+               <string>Масса 1 м, кг</string>
+              </property>
+             </column>
+            </widget>
+           </item>
+          </layout>
+         </widget>
+        </item>
+        <item>
+         <layout class="QHBoxLayout" name="horizontalLayout_buttons">
+          <item>
+           <widget class="QPushButton" name="btn_run">
+            <property name="styleSheet">
+             <string>font-weight: bold; height: 40px;</string>
+            </property>
+            <property name="text">
+             <string>Запустить оптимизацию</string>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <widget class="QPushButton" name="btn_stop">
+            <property name="text">
+             <string>Стоп</string>
+            </property>
+           </widget>
+          </item>
+         </layout>
+        </item>
+        <item>
+         <widget class="QProgressBar" name="progressBar">
+          <property name="value">
+           <number>0</number>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <spacer name="verticalSpacer">
+          <property name="orientation">
+           <enum>Qt::Vertical</enum>
+          </property>
+          <property name="sizeHint" stdset="0">
+           <size>
+            <width>20</width>
+            <height>40</height>
+           </size>
+          </property>
+         </spacer>
+        </item>
+       </layout>
+      </item>
+      <item>
+       <layout class="QVBoxLayout" name="layout_plot"/>
+      </item>
+     </layout>
+    </item>
+    <item>
+     <widget class="QTextEdit" name="log_output">
+      <property name="maximumSize">
+       <size>
+        <width>16777215</width>
+        <height>150</height>
+       </size>
+      </property>
+      <property name="readOnly">
+       <bool>true</bool>
+      </property>
+      <property name="placeholderText">
+       <string>Лог процесса расчетного ядра Nastran...</string>
+      </property>
+     </widget>
+    </item>
+   </layout>
+  </widget>
+ </widget>
+ <resources/>
+ <connections/>
+</ui>
