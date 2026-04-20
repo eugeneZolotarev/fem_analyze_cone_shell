@@ -3,6 +3,7 @@ import time
 import traceback
 import threading
 import shutil
+import re
 import numpy as np
 import pythoncom
 from abc import ABC, abstractmethod
@@ -139,15 +140,9 @@ class ConeModelBuilder(ModelBuilder):
             nd = self.app.feNode; rc, num, ids, xyz = nd.GetCoordArray(0)
             nodes = {ids[i]: xyz[3*i+2] for i in range(num)}; zmin, zmax = min(nodes.values()), max(nodes.values())
             nb = [i for i, z in nodes.items() if abs(z-zmin)<1e-7]; nt = [i for i, z in nodes.items() if abs(z-zmax)<1e-7]
-            
             n_obj = self.app.feNode
-            self._center_bottom_rbe2_node = n_obj.NextEmptyID()
-            # Явно обнуляем X и Y для центра
-            n_obj.x = 0.0; n_obj.y = 0.0; n_obj.z = zmin; n_obj.Put(self._center_bottom_rbe2_node)
-            
-            self._center_top_rbe2_node = n_obj.NextEmptyID()
-            n_obj.x = 0.0; n_obj.y = 0.0; n_obj.z = zmax; n_obj.Put(self._center_top_rbe2_node)
-            
+            self._center_bottom_rbe2_node = n_obj.NextEmptyID(); n_obj.x = 0.0; n_obj.y = 0.0; n_obj.z = zmin; n_obj.Put(self._center_bottom_rbe2_node)
+            self._center_top_rbe2_node = n_obj.NextEmptyID(); n_obj.x = 0.0; n_obj.y = 0.0; n_obj.z = zmax; n_obj.Put(self._center_top_rbe2_node)
             for cid, dep in [(self._center_bottom_rbe2_node, nb), (self._center_top_rbe2_node, nt)]:
                 el = self.app.feElem; el.type, el.topology, el.RigidInterpolate = 29, 13, False
                 vn = list(el.vnode); vn[0] = cid; el.vnode = vn; el.vrelease = ((1,1,1,0,0,0),(1,1,1,0,0,0))
@@ -190,19 +185,51 @@ class ConeModelBuilder(ModelBuilder):
         finally: self.app.DialogAutoSkip = 0
 
     def read_results(self):
-        if not self.app: return 0.0
-        os = self.app.feSet; os.AddAll(28); os.Reset(); last_id = 0
+        """Считывает напряжения из Set 1 (Статика) и Eigenvalue из Set 2 (Устойчивость)."""
+        if not self.app: return {"max_stress": 0.0, "eigenvalue": 0.0}
+        
+        os = self.app.feSet; os.AddAll(28); os.Reset()
+        set_ids = []
         while True:
-            oid = os.Next(); 
+            oid = os.Next()
             if oid == 0: break
-            last_id = oid
-        if last_id == 0: return 0.0
-        el = self.app.feSet; el.AddAll(8); res = self.app.feResults
-        res.clear(); res.DataNeeded(8, el.ID); rc, n, idx = res.AddColumnV2(last_id, 7033, False)
-        if rc == -1:
-            res.Populate(); rc, val = res.GetScalarAtElemSetV2(idx[0], el.ID)
-            if rc == -1 and val: return float(max(val))
-        return 0.0
+            set_ids.append(oid)
+            
+        if len(set_ids) < 2:
+            print("ПРЕДУПРЕЖДЕНИЕ: Найдено менее 2-х наборов результатов. Проверьте расчет.")
+            # Если набор всего один, попробуем извлечь из него хоть что-то
+            static_id = set_ids[0] if set_ids else 0
+            buckling_id = 0
+        else:
+            # СТРОГАЯ ЛОГИКА SOL 105:
+            static_id = set_ids[0]   # Первый набор - статика (Pre-buckling)
+            buckling_id = set_ids[1] # Второй набор - первая мода (Buckling Mode 1)
+
+        # 1. Извлекаем Eigenvalue из набора Устойчивости (buckling_id)
+        eigenvalue = 0.0
+        if buckling_id > 0:
+            os_obj = self.app.feOutputSet; os_obj.Get(buckling_id)
+            match = re.search(r"Eigenvalue\s+\d+\s+([\d.]+)", os_obj.title)
+            if match:
+                try: eigenvalue = float(match.group(1))
+                except: pass
+
+        # 2. Извлекаем Max Von Mises из набора Статики (static_id)
+        max_stress = 0.0
+        if static_id > 0:
+            el_set = self.app.feSet; el_set.AddAll(8)
+            res = self.app.feResults; res.clear(); res.DataNeeded(8, el_set.ID)
+            # Вектор 7033 - Plate Top Von Mises
+            rc, n, idx = res.AddColumnV2(static_id, 7033, False)
+            if rc == -1:
+                res.Populate(); rc, val = res.GetScalarAtElemSetV2(idx[0], el_set.ID)
+                if rc == -1 and val:
+                    # Фильтруем нули и NaN для чистоты результата
+                    arr = np.array(val)
+                    valid = arr[np.isfinite(arr) & (arr > 0)]
+                    if valid.size > 0: max_stress = float(np.max(valid))
+
+        return {"max_stress": max_stress, "eigenvalue": eigenvalue}
 
     def configure_view(self):
         if not self.app: return False
@@ -225,10 +252,6 @@ class ConeModelBuilder(ModelBuilder):
             for filename in os.listdir(models_dir):
                 file_path = os.path.join(models_dir, filename)
                 try:
-                    if os.path.isfile(file_path) or os.path.islink(file_path):
-                        os.unlink(file_path)
-                    elif os.path.isdir(file_path):
-                        shutil.rmtree(file_path)
-                    print(f"Удален: {filename}")
-                except Exception as e:
-                    print(f"Не удалось удалить {filename}: {e}")
+                    if os.path.isfile(file_path) or os.path.islink(file_path): os.unlink(file_path)
+                    elif os.path.isdir(file_path): shutil.rmtree(file_path)
+                except: pass

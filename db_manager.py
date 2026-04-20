@@ -1,49 +1,37 @@
-import numpy as np
 from PySide6.QtSql import QSqlDatabase, QSqlQuery, QSqlError
 from PySide6.QtCore import QObject
+import numpy as np
 
 class DatabaseManager(QObject):
-    """Менеджер для работы с PostgreSQL с расширенной диагностикой."""
+    """Менеджер для работы с PostgreSQL с гарантированной записью."""
     
     def __init__(self):
         super().__init__()
-        if "QPSQL" not in QSqlDatabase.drivers():
-            print("КРИТИЧЕСКАЯ ОШИБКА: Драйвер QPSQL не найден.")
+        self.db = None
 
     def connect_db(self, config):
-        """Устанавливает соединение с БД."""
-        if "QPSQL" not in QSqlDatabase.drivers():
-            return False, "Драйвер QPSQL не найден."
-
-        # Используем уникальное имя соединения для потокобезопасности
         connection_name = "OptimizationConnection"
         if QSqlDatabase.contains(connection_name):
             self.db = QSqlDatabase.database(connection_name)
         else:
             self.db = QSqlDatabase.addDatabase("QPSQL", connection_name)
         
-        host = str(config.get("host", "localhost"))
-        port = int(config.get("port", 5432))
-        dbname = str(config.get("name", ""))
-        user = str(config.get("user", ""))
-        pwd = str(config.get("password", ""))
-
-        self.db.setHostName(host)
-        self.db.setPort(port)
-        self.db.setDatabaseName(dbname)
-        self.db.setUserName(user)
-        self.db.setPassword(pwd)
+        self.db.setHostName(str(config.get("host", "localhost")))
+        self.db.setPort(int(config.get("port", 5432)))
+        self.db.setDatabaseName(str(config.get("name", "")))
+        self.db.setUserName(str(config.get("user", "")))
+        self.db.setPassword(str(config.get("password", "")))
 
         if not self.db.open():
-            err = self.db.lastError()
-            msg = f"БД: {err.text()} (Host: {host}, Port: {port})"
-            return False, msg
+            return False, f"Ошибка: {self.db.lastError().text()}"
         
-        self._create_table_if_not_exists()
-        return True, "Успешное подключение."
+        self._sync_schema()
+        return True, "Подключено."
 
-    def _create_table_if_not_exists(self):
+    def _sync_schema(self):
+        """Создает таблицу и добавляет недостающие колонки без ошибок."""
         query = QSqlQuery(self.db)
+        # 1. Создаем базовую таблицу
         query.exec("""
             CREATE TABLE IF NOT EXISTS optimization_results (
                 id SERIAL PRIMARY KEY,
@@ -55,35 +43,48 @@ class DatabaseManager(QObject):
                 status TEXT
             )
         """)
+        
+        # 2. Проверяем и добавляем новые колонки (eigenvalue, total_mass)
+        # Используем PostgreSQL-специфичный запрос для проверки колонок
+        for col in [("eigenvalue", "DOUBLE PRECISION"), ("total_mass", "DOUBLE PRECISION")]:
+            check_query = f"""
+                SELECT 1 FROM information_schema.columns 
+                WHERE table_name='optimization_results' AND column_name='{col[0]}'
+            """
+            query.exec(check_query)
+            if not query.next():
+                query.exec(f"ALTER TABLE optimization_results ADD COLUMN {col[0]} {col[1]}")
 
     def save_iteration_result(self, data):
-        """Сохраняет результат, предотвращая вставку некорректных чисел."""
-        if not self.db.isOpen(): return False
+        """Сохраняет результат с проверкой ошибок выполнения."""
+        if not self.db or not self.db.isOpen():
+            print("БД: Попытка записи в закрытую базу!")
+            return False
         
-        # Защита от NaN или бесконечных значений
-        try:
-            stress = float(data.get("max_stress", 0.0))
-            if np.isnan(stress) or np.isinf(stress):
-                stress = -1.0
-        except:
-            stress = -1.0
+        def safe_f(val):
+            try:
+                f = float(val)
+                return f if np.isfinite(f) else 0.0
+            except: return 0.0
 
         query = QSqlQuery(self.db)
         query.prepare("""
-            INSERT INTO optimization_results (skin_thickness, stringer_count, profile_number, max_stress, status)
-            VALUES (:t, :n, :p, :s, :st)
+            INSERT INTO optimization_results 
+            (skin_thickness, stringer_count, profile_number, max_stress, eigenvalue, total_mass, status)
+            VALUES (:t, :n, :p, :s, :e, :m, :st)
         """)
-        query.bindValue(":t", float(data.get("t", 0.0)))
+        query.bindValue(":t", safe_f(data.get("t")))
         query.bindValue(":n", int(data.get("n", 0)))
         query.bindValue(":p", str(data.get("profile", "Unknown")))
-        query.bindValue(":s", stress)
+        query.bindValue(":s", safe_f(data.get("max_stress")))
+        query.bindValue(":e", safe_f(data.get("eigenvalue")))
+        query.bindValue(":m", safe_f(data.get("mass")))
         query.bindValue(":st", str(data.get("status", "Success")))
         
-        if not query.exec():
-            print(f"Ошибка вставки: {query.lastError().text()}")
-            return False
-        return True
+        success = query.exec()
+        if not success:
+            print(f"КРИТИЧЕСКАЯ ОШИБКА ЗАПИСИ В БД: {query.lastError().text()}")
+        return success
 
     def close(self):
-        if hasattr(self, 'db') and self.db.isOpen():
-            self.db.close()
+        if self.db and self.db.isOpen(): self.db.close()

@@ -29,11 +29,6 @@
     "diameter_small": 1.4,
     "height": 1.036
   },
-  "mesh": {
-    "divisions_circular": 40,
-    "divisions_height": 20,
-    "stringers_count": 8
-  },
   "loads": {
     "axial_force": -1000.0
   },
@@ -47,6 +42,6 @@
     "port": 5432,
     "name": "first_db",
     "user": "postgres",
-    "password": "password"
+    "password": "postgres"
   }
 }

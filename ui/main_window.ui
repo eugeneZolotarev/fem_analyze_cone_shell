@@ -10,276 +10,77 @@
     <height>895</height>
    </rect>
   </property>
-  <property name="minimumSize">
-   <size>
-    <width>1150</width>
-    <height>895</height>
-   </size>
-  </property>
   <property name="windowTitle">
-   <string>RocketShell Optimizer - Расчет конических отсеков</string>
+   <string>RocketShell Optimizer</string>
   </property>
   <property name="styleSheet">
-   <string notr="true">/* =========================================
-   ОБЩИЙ ФОН И ШРИФТЫ
-   ========================================= */
-QWidget {
-    background-color: #2b2b2b;
-    color: #e0e0e0;
-    font-family: &quot;Segoe UI&quot;, &quot;Helvetica Neue&quot;, Arial, sans-serif;
-    font-size: 10pt;
-}
-
-/* =========================================
-   ГРУППЫ ПАРАМЕТРОВ (QGroupBox)
-   ========================================= */
-QGroupBox {
-    border: 1px solid #555555;
-    border-radius: 6px;
-    margin-top: 1.2em; /* Отступ сверху, чтобы заголовок не наезжал на рамку */
-    padding-top: 10px;
-}
-
-QGroupBox::title {
-    subcontrol-origin: margin;
-    subcontrol-position: top left;
-    padding: 0 8px;
-    color: #4da6ff; /* Инженерный синий акцент */
-    font-weight: bold;
-}
-
-/* =========================================
-   ПОЛЯ ВВОДА (SpinBoxes)
-   ========================================= */
-QSpinBox, QDoubleSpinBox {
-    background-color: #3c3f41;
-    border: 1px solid #555555;
-    border-radius: 4px;
-    padding: 4px;
-    color: #ffffff;
-    min-width: 60px;
-}
-
-QSpinBox:focus, QDoubleSpinBox:focus {
-    border: 1px solid #4da6ff; /* Синяя подсветка при вводе с клавиатуры */
-    background-color: #45494a;
-}
-
-/* Стилизация стрелочек вверх/вниз */
-QSpinBox::up-button, QDoubleSpinBox::up-button,
-QSpinBox::down-button, QDoubleSpinBox::down-button {
-    background-color: #45494a;
-    border-left: 1px solid #555555;
-    width: 20px;
-}
-
-QSpinBox::up-button:hover, QDoubleSpinBox::up-button:hover,
-QSpinBox::down-button:hover, QDoubleSpinBox::down-button:hover {
-    background-color: #54585a;
-}
-
-/* =========================================
-   ТАБЛИЦА СОРТАМЕНТА (QTableWidget)
-   ========================================= */
-QTableWidget {
-    background-color: #1e1e1e;
-    alternate-background-color: #2a2d2e; /* Цвет для &quot;зебры&quot; (четные строки) */
-    color: #e0e0e0;
-    gridline-color: #3c3f41;
-    border: 1px solid #555555;
-    border-radius: 4px;
-    outline: none; /* Убирает пунктирную рамку фокуса */
-}
-
-QTableWidget::item {
-    padding: 4px;
-}
-
-QTableWidget::item:hover {
-    background-color: #353839; /* Легкая подсветка при наведении */
-}
-
-QTableWidget::item:selected {
-    background-color: #007ACC; /* Глубокий синий при выборе профиля */
-    color: white;
-    font-weight: bold;
-}
-
-/* Заголовки столбцов таблицы */
-QHeaderView::section {
-    background-color: #3c3f41;
-    color: #ffffff;
-    padding: 6px;
-    border: 1px solid #555555;
-    border-top: none;
-    border-left: none;
-    font-weight: bold;
-    font-size: 9pt;
-}
-
-QHeaderView::section:hover {
-    background-color: #54585a;
-}
-
-/* Квадратик в левом верхнем углу таблицы */
-QTableCornerButton::section {
-    background-color: #3c3f41;
-    border: 1px solid #555555;
-}
-
-/* =========================================
-   КНОПКИ (QPushButton)
-   ========================================= */
-QPushButton {
-    background-color: #45494a;
-    border: 1px solid #555555;
-    border-radius: 4px;
-    padding: 8px 15px;
-    color: #e0e0e0;
-}
-
-QPushButton:hover {
-    background-color: #54585a;
-    border: 1px solid #777777;
-}
-
-QPushButton:pressed {
-    background-color: #3c3f41;
-}
-
-/* Спец. стиль для кнопки &quot;Запустить&quot; */
-QPushButton#btn_run {
-    background-color: #2b7041; /* Спокойный зеленый */
-    border: 1px solid #3d9e5a;
-    color: white;
-    font-size: 11pt;
-}
-
-QPushButton#btn_run:hover {
-    background-color: #358c51;
-}
-
-QPushButton#btn_run:pressed {
-    background-color: #1f5230;
-}
-
-/* Спец. стиль для кнопки &quot;Стоп&quot; */
-QPushButton#btn_stop {
-    background-color: #8c3d3d; /* Спокойный красный */
-    border: 1px solid #a64d4d;
-    color: white;
-}
-
-QPushButton#btn_stop:hover {
-    background-color: #a64d4d;
-}
-
-QPushButton#btn_stop:pressed {
-    background-color: #5c2828;
-}
-
-/* =========================================
-   ШКАЛА ПРОГРЕССА (QProgressBar)
-   ========================================= */
-QProgressBar {
-    border: 1px solid #555555;
-    border-radius: 4px;
-    text-align: center;
-    background-color: #1e1e1e;
-    color: white;
-    font-weight: bold;
-    min-height: 20px;
-}
-
-QProgressBar::chunk {
-    background-color: qlineargradient(spread:pad, x1:0, y1:0, x2:1, y2:0, stop:0 #007ACC, stop:1 #4da6ff);
-    border-radius: 3px;
-}
-
-/* =========================================
-   ТЕРМИНАЛ ЛОГОВ (QTextEdit)
-   ========================================= */
-QTextEdit#log_output {
-    background-color: #121212; /* Черный фон как в настоящем терминале */
-    color: #a9b7c6; /* Цвет текста как в IDE */
-    font-family: &quot;Consolas&quot;, &quot;Courier New&quot;, monospace; /* Строго моноширинный шрифт */
-    font-size: 10pt;
-    border: 1px solid #555555;
-    border-radius: 4px;
-    padding: 8px;
-}</string>
+   <string notr="true">
+/* --- Общий фон --- */
+QWidget { background-color: #2b2b2b; color: #e0e0e0; font-family: &quot;Segoe UI&quot;; font-size: 10pt; }
+QGroupBox { border: 1px solid #555555; border-radius: 6px; margin-top: 1.2em; padding-top: 10px; }
+QGroupBox::title { subcontrol-origin: margin; subcontrol-position: top left; padding: 0 8px; color: #4da6ff; font-weight: bold; }
+QSpinBox, QLineEdit { background-color: #3c3f41; border: 1px solid #555555; border-radius: 4px; padding: 4px; color: #ffffff; }
+QSpinBox:focus, QLineEdit:focus { border: 1px solid #4da6ff; }
+QPushButton { background-color: #45494a; border: 1px solid #555555; border-radius: 4px; padding: 8px 15px; color: #e0e0e0; }
+QPushButton#btn_run { background-color: #2b7041; border: 1px solid #3d9e5a; color: white; font-weight: bold; }
+QPushButton#btn_run:hover { background-color: #358c51; }
+QPushButton#btn_stop { background-color: #8c3d3d; border: 1px solid #a64d4d; color: white;}
+QTableWidget { background-color: #1e1e1e; alternate-background-color: #2a2d2e; gridline-color: #3c3f41; border: 1px solid #555555; }
+QHeaderView::section { background-color: #3c3f41; color: white; padding: 5px; font-weight: bold; border: 1px solid #555555; }
+QTextEdit#log_output { background-color: #121212; color: #a9b7c6; font-family: &quot;Consolas&quot;, monospace; border: 1px solid #555555; }
+</string>
   </property>
   <widget class="QWidget" name="centralwidget">
    <layout class="QVBoxLayout" name="verticalLayout_main">
     <item>
-     <layout class="QHBoxLayout" name="horizontalLayout_top" stretch="1,1">
+     <layout class="QHBoxLayout" name="horizontalLayout_top" stretch="1,2">
       <item>
-       <layout class="QVBoxLayout" name="verticalLayout_left" stretch="1,1,2,1,1,1">
+       <layout class="QVBoxLayout" name="verticalLayout_left">
         <item>
          <widget class="QGroupBox" name="group_geometry">
-          <property name="sizePolicy">
-           <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
-            <horstretch>0</horstretch>
-            <verstretch>0</verstretch>
-           </sizepolicy>
-          </property>
-          <property name="styleSheet">
-           <string notr="true">QGroupBox {
-	margin: 0px;
-}</string>
-          </property>
           <property name="title">
-           <string>Геометрия усеченного конуса (мм)</string>
+           <string>Геометрия конуса (мм)</string>
           </property>
-          <layout class="QGridLayout" name="gridLayout_geom">
-           <item row="0" column="0">
-            <widget class="QLabel" name="label_height">
-             <property name="text">
-              <string>Высота (H):</string>
-             </property>
-            </widget>
-           </item>
-           <item row="0" column="1">
-            <widget class="QDoubleSpinBox" name="sb_height">
-             <property name="maximum">
-              <double>10000.000000000000000</double>
-             </property>
-             <property name="value">
-              <double>1036.000000000000000</double>
-             </property>
-            </widget>
-           </item>
-           <item row="1" column="0">
-            <widget class="QLabel" name="label_d_small">
-             <property name="text">
-              <string>Малый диам. (d):</string>
-             </property>
-            </widget>
-           </item>
-           <item row="1" column="1">
-            <widget class="QDoubleSpinBox" name="sb_d_small">
-             <property name="maximum">
-              <double>5000.000000000000000</double>
-             </property>
-             <property name="value">
-              <double>1400.000000000000000</double>
-             </property>
-            </widget>
-           </item>
-           <item row="2" column="0">
-            <widget class="QLabel" name="label_d_large">
+          <layout class="QGridLayout" name="gridLayout">
+           <item row="0" column="2">
+            <widget class="QLabel" name="lbl_geom_dl">
              <property name="text">
               <string>Больший диам. (D):</string>
              </property>
             </widget>
            </item>
-           <item row="2" column="1">
-            <widget class="QDoubleSpinBox" name="sb_d_large">
-             <property name="maximum">
-              <double>5000.000000000000000</double>
+           <item row="1" column="0">
+            <widget class="QLabel" name="lbl_geom_ds">
+             <property name="text">
+              <string>Малый диам. (d):</string>
              </property>
-             <property name="value">
-              <double>1600.000000000000000</double>
+            </widget>
+           </item>
+           <item row="0" column="0">
+            <widget class="QLabel" name="lbl_geom_h">
+             <property name="text">
+              <string>Высота (H):</string>
+             </property>
+            </widget>
+           </item>
+           <item row="1" column="1">
+            <widget class="QLineEdit" name="sb_d_small">
+             <property name="text">
+              <string>1400.0</string>
+             </property>
+            </widget>
+           </item>
+           <item row="0" column="1">
+            <widget class="QLineEdit" name="sb_height">
+             <property name="text">
+              <string>1036.0</string>
+             </property>
+            </widget>
+           </item>
+           <item row="0" column="3">
+            <widget class="QLineEdit" name="sb_d_large">
+             <property name="text">
+              <string>1600.0</string>
              </property>
             </widget>
            </item>
@@ -288,23 +89,12 @@ QTextEdit#log_output {
         </item>
         <item>
          <widget class="QGroupBox" name="group_material">
-          <property name="sizePolicy">
-           <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
-            <horstretch>0</horstretch>
-            <verstretch>0</verstretch>
-           </sizepolicy>
-          </property>
-          <property name="styleSheet">
-           <string notr="true">QGroupBox {
-	margin: 0px;
-}</string>
-          </property>
           <property name="title">
-           <string>Свойства материала</string>
+           <string>Материал</string>
           </property>
-          <layout class="QFormLayout" name="formLayout_mat">
+          <layout class="QGridLayout" name="gridLayout_2">
            <item row="0" column="0">
-            <widget class="QLabel" name="label_mat_name">
+            <widget class="QLabel" name="lbl_mat_name">
              <property name="text">
               <string>Название:</string>
              </property>
@@ -313,64 +103,68 @@ QTextEdit#log_output {
            <item row="0" column="1">
             <widget class="QLineEdit" name="txt_mat_name">
              <property name="text">
-              <string>Steel_Standard</string>
-             </property>
-            </widget>
-           </item>
-           <item row="1" column="0">
-            <widget class="QLabel" name="label_mat_e">
-             <property name="text">
-              <string>E (МПа):</string>
+              <string>Steel</string>
              </property>
             </widget>
            </item>
            <item row="1" column="1">
-            <widget class="QDoubleSpinBox" name="sb_mat_e">
-             <property name="decimals">
-              <number>0</number>
-             </property>
-             <property name="maximum">
-              <double>999999999999.000000000000000</double>
-             </property>
-             <property name="value">
-              <double>210000.000000000000000</double>
+            <widget class="QLineEdit" name="sb_mat_e">
+             <property name="text">
+              <string>210000.0</string>
              </property>
             </widget>
            </item>
-           <item row="2" column="0">
-            <widget class="QLabel" name="label_mat_nu">
+           <item row="0" column="2">
+            <widget class="QLabel" name="lbl_mat_nu">
              <property name="text">
               <string>Коэф. Пуассона:</string>
              </property>
             </widget>
            </item>
-           <item row="2" column="1">
-            <widget class="QDoubleSpinBox" name="sb_mat_nu">
-             <property name="maximum">
-              <double>0.500000000000000</double>
-             </property>
-             <property name="singleStep">
-              <double>0.010000000000000</double>
-             </property>
-             <property name="value">
-              <double>0.300000000000000</double>
-             </property>
-            </widget>
-           </item>
-           <item row="3" column="0">
-            <widget class="QLabel" name="label_mat_yield">
+           <item row="1" column="0">
+            <widget class="QLabel" name="lbl_mat_e">
              <property name="text">
-              <string>Sigma_y (МПа):</string>
+              <string>E (МПа):</string>
              </property>
             </widget>
            </item>
-           <item row="3" column="1">
-            <widget class="QDoubleSpinBox" name="sb_mat_yield">
-             <property name="maximum">
-              <double>1000000.000000000000000</double>
+           <item row="0" column="3">
+            <widget class="QLineEdit" name="sb_mat_nu">
+             <property name="text">
+              <string>0.3</string>
              </property>
-             <property name="value">
-              <double>250.000000000000000</double>
+            </widget>
+           </item>
+           <item row="1" column="2">
+            <widget class="QLabel" name="lbl_mat_density">
+             <property name="text">
+              <string>Плотность:</string>
+             </property>
+            </widget>
+           </item>
+           <item row="1" column="3">
+            <widget class="QLineEdit" name="sb_mat_density"/>
+           </item>
+          </layout>
+         </widget>
+        </item>
+        <item>
+         <widget class="QGroupBox" name="group_loads">
+          <property name="title">
+           <string>Нагрузки</string>
+          </property>
+          <layout class="QFormLayout" name="form_loads">
+           <item row="0" column="0">
+            <widget class="QLabel" name="lbl_load_force">
+             <property name="text">
+              <string>Осевая сила (Н):</string>
+             </property>
+            </widget>
+           </item>
+           <item row="0" column="1">
+            <widget class="QLineEdit" name="sb_load">
+             <property name="text">
+              <string>-1000.0</string>
              </property>
             </widget>
            </item>
@@ -378,63 +172,52 @@ QTextEdit#log_output {
          </widget>
         </item>
         <item>
-         <layout class="QHBoxLayout" name="horizontalLayout_ranges">
+         <layout class="QHBoxLayout" name="horizontalLayout_ranges" stretch="1,1">
           <item>
            <widget class="QGroupBox" name="group_skin">
-            <property name="sizePolicy">
-             <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
-              <horstretch>0</horstretch>
-              <verstretch>0</verstretch>
-             </sizepolicy>
-            </property>
-            <property name="styleSheet">
-             <string notr="true">QGroupBox {
-	margin: 0px;
-}</string>
-            </property>
             <property name="title">
              <string>Обшивка (t, мм)</string>
             </property>
-            <layout class="QFormLayout" name="form_skin">
-             <item row="0" column="0">
-              <widget class="QLabel" name="label_t_min">
+            <layout class="QGridLayout" name="gridLayout_3">
+             <item row="1" column="1">
+              <widget class="QLineEdit" name="sb_thick_max">
                <property name="text">
-                <string>Мин:</string>
+                <string>2.0</string>
                </property>
               </widget>
              </item>
              <item row="0" column="1">
-              <widget class="QDoubleSpinBox" name="sb_thick_min">
-               <property name="value">
-                <double>0.500000000000000</double>
+              <widget class="QLineEdit" name="sb_thick_min">
+               <property name="text">
+                <string>0.5</string>
                </property>
               </widget>
              </item>
              <item row="1" column="0">
-              <widget class="QLabel" name="label_t_max">
+              <widget class="QLabel" name="lbl_skin_max">
                <property name="text">
                 <string>Макс:</string>
                </property>
               </widget>
              </item>
-             <item row="1" column="1">
-              <widget class="QDoubleSpinBox" name="sb_thick_max">
-               <property name="value">
-                <double>2.000000000000000</double>
+             <item row="0" column="0">
+              <widget class="QLabel" name="lbl_skin_min">
+               <property name="text">
+                <string>Мин:</string>
                </property>
               </widget>
              </item>
-             <item row="2" column="0">
-              <widget class="QLabel" name="label_t_step">
+             <item row="0" column="2">
+              <widget class="QLabel" name="lbl_skin_step">
                <property name="text">
                 <string>Шаг:</string>
                </property>
               </widget>
              </item>
-             <item row="2" column="1">
-              <widget class="QDoubleSpinBox" name="sb_thick_step">
-               <property name="value">
-                <double>0.100000000000000</double>
+             <item row="0" column="3">
+              <widget class="QLineEdit" name="sb_thick_step">
+               <property name="text">
+                <string>0.5</string>
                </property>
               </widget>
              </item>
@@ -443,25 +226,31 @@ QTextEdit#log_output {
           </item>
           <item>
            <widget class="QGroupBox" name="group_stringers">
-            <property name="sizePolicy">
-             <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
-              <horstretch>0</horstretch>
-              <verstretch>0</verstretch>
-             </sizepolicy>
-            </property>
-            <property name="styleSheet">
-             <string notr="true">QGroupBox {
-	margin: 0px;
-}</string>
-            </property>
             <property name="title">
              <string>Стрингеры (Шт)</string>
             </property>
-            <layout class="QFormLayout" name="form_stringers">
+            <layout class="QGridLayout" name="gridLayout_4">
              <item row="0" column="0">
-              <widget class="QLabel" name="label_str_min">
+              <widget class="QLabel" name="lbl_str_min">
                <property name="text">
                 <string>Мин:</string>
+               </property>
+              </widget>
+             </item>
+             <item row="1" column="1">
+              <widget class="QSpinBox" name="sb_str_max">
+               <property name="maximum">
+                <number>500</number>
+               </property>
+               <property name="value">
+                <number>80</number>
+               </property>
+              </widget>
+             </item>
+             <item row="1" column="0">
+              <widget class="QLabel" name="lbl_str_max">
+               <property name="text">
+                <string>Макс:</string>
                </property>
               </widget>
              </item>
@@ -475,36 +264,29 @@ QTextEdit#log_output {
                </property>
               </widget>
              </item>
-             <item row="1" column="0">
-              <widget class="QLabel" name="label_str_max">
+             <item row="0" column="2">
+              <widget class="QLabel" name="lbl_str_eb">
                <property name="text">
-                <string>Макс:</string>
+                <string>КЭ между:</string>
                </property>
               </widget>
              </item>
-             <item row="1" column="1">
-              <widget class="QSpinBox" name="sb_str_max">
-               <property name="maximum">
-                <number>500</number>
-               </property>
+             <item row="0" column="3">
+              <widget class="QSpinBox" name="sb_elements_between">
                <property name="value">
-                <number>120</number>
+                <number>2</number>
                </property>
               </widget>
              </item>
-             <item row="2" column="0">
-              <widget class="QLabel" name="label_str_step">
+             <item row="1" column="2">
+              <widget class="QLabel" name="lbl_str_along">
                <property name="text">
-                <string>Шаг:</string>
+                <string>КЭ вдоль:</string>
                </property>
               </widget>
              </item>
-             <item row="2" column="1">
-              <widget class="QSpinBox" name="sb_str_step">
-               <property name="value">
-                <number>10</number>
-               </property>
-              </widget>
+             <item row="1" column="3">
+              <widget class="QSpinBox" name="sb_str_along"/>
              </item>
             </layout>
            </widget>
@@ -513,64 +295,18 @@ QTextEdit#log_output {
         </item>
         <item>
          <widget class="QGroupBox" name="group_assortment">
-          <property name="styleSheet">
-           <string notr="true">QGroupBox {
-	margin: 0px;
-}</string>
-          </property>
           <property name="title">
            <string>Сортамент профилей</string>
           </property>
-          <layout class="QVBoxLayout" name="verticalLayout_list">
+          <layout class="QVBoxLayout">
            <item>
-            <widget class="QTableWidget" name="table_profiles">
-             <column>
-              <property name="text">
-               <string>№</string>
-              </property>
-             </column>
-             <column>
-              <property name="text">
-               <string>H, мм</string>
-              </property>
-             </column>
-             <column>
-              <property name="text">
-               <string>B, мм</string>
-              </property>
-             </column>
-             <column>
-              <property name="text">
-               <string>S, мм</string>
-              </property>
-             </column>
-             <column>
-              <property name="text">
-               <string>S1, мм</string>
-              </property>
-             </column>
-             <column>
-              <property name="text">
-               <string>S2, мм</string>
-              </property>
-             </column>
-             <column>
-              <property name="text">
-               <string>S сечения, мм^2</string>
-              </property>
-             </column>
-             <column>
-              <property name="text">
-               <string>Масса 1 м, кг</string>
-              </property>
-             </column>
-            </widget>
+            <widget class="QTableWidget" name="table_profiles"/>
            </item>
           </layout>
          </widget>
         </item>
         <item>
-         <layout class="QHBoxLayout" name="horizontalLayout_buttons">
+         <layout class="QHBoxLayout">
           <item>
            <spacer name="horizontalSpacer">
             <property name="orientation">
@@ -586,27 +322,6 @@ QTextEdit#log_output {
           </item>
           <item>
            <widget class="QPushButton" name="btn_run">
-            <property name="sizePolicy">
-             <sizepolicy hsizetype="Minimum" vsizetype="Minimum">
-              <horstretch>0</horstretch>
-              <verstretch>0</verstretch>
-             </sizepolicy>
-            </property>
-            <property name="minimumSize">
-             <size>
-              <width>0</width>
-              <height>0</height>
-             </size>
-            </property>
-            <property name="maximumSize">
-             <size>
-              <width>16777215</width>
-              <height>30</height>
-             </size>
-            </property>
-            <property name="styleSheet">
-             <string>font-weight: bold; height: 40px;</string>
-            </property>
             <property name="text">
              <string>Запустить оптимизацию</string>
             </property>
@@ -614,12 +329,6 @@ QTextEdit#log_output {
           </item>
           <item>
            <widget class="QPushButton" name="btn_stop">
-            <property name="maximumSize">
-             <size>
-              <width>16777215</width>
-              <height>30</height>
-             </size>
-            </property>
             <property name="text">
              <string>Стоп</string>
             </property>
@@ -628,11 +337,7 @@ QTextEdit#log_output {
          </layout>
         </item>
         <item>
-         <widget class="QProgressBar" name="progressBar">
-          <property name="value">
-           <number>0</number>
-          </property>
-         </widget>
+         <widget class="QProgressBar" name="progressBar"/>
         </item>
        </layout>
       </item>
@@ -643,17 +348,8 @@ QTextEdit#log_output {
     </item>
     <item>
      <widget class="QTextEdit" name="log_output">
-      <property name="maximumSize">
-       <size>
-        <width>16777215</width>
-        <height>150</height>
-       </size>
-      </property>
-      <property name="readOnly">
-       <bool>true</bool>
-      </property>
       <property name="placeholderText">
-       <string>Лог процесса расчетного ядра Nastran...</string>
+       <string>Лог процесса...</string>
       </property>
      </widget>
     </item>

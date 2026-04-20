@@ -15,213 +15,33 @@ from PySide6.QtGui import (QBrush, QColor, QConicalGradient, QCursor,
     QFont, QFontDatabase, QGradient, QIcon,
     QImage, QKeySequence, QLinearGradient, QPainter,
     QPalette, QPixmap, QRadialGradient, QTransform)
-from PySide6.QtWidgets import (QApplication, QDoubleSpinBox, QFormLayout, QGridLayout,
-    QGroupBox, QHBoxLayout, QHeaderView, QLabel,
-    QLineEdit, QMainWindow, QProgressBar, QPushButton,
-    QSizePolicy, QSpacerItem, QSpinBox, QTableWidget,
-    QTableWidgetItem, QTextEdit, QVBoxLayout, QWidget)
+from PySide6.QtWidgets import (QApplication, QFormLayout, QGridLayout, QGroupBox,
+    QHBoxLayout, QHeaderView, QLabel, QLineEdit,
+    QMainWindow, QProgressBar, QPushButton, QSizePolicy,
+    QSpacerItem, QSpinBox, QTableWidget, QTableWidgetItem,
+    QTextEdit, QVBoxLayout, QWidget)
 
 class Ui_MainWindow(object):
     def setupUi(self, MainWindow):
         if not MainWindow.objectName():
             MainWindow.setObjectName(u"MainWindow")
         MainWindow.resize(1150, 895)
-        MainWindow.setMinimumSize(QSize(1150, 895))
-        MainWindow.setStyleSheet(u"/* =========================================\n"
-"   \u041e\u0411\u0429\u0418\u0419 \u0424\u041e\u041d \u0418 \u0428\u0420\u0418\u0424\u0422\u042b\n"
-"   ========================================= */\n"
-"QWidget {\n"
-"    background-color: #2b2b2b;\n"
-"    color: #e0e0e0;\n"
-"    font-family: \"Segoe UI\", \"Helvetica Neue\", Arial, sans-serif;\n"
-"    font-size: 10pt;\n"
-"}\n"
-"\n"
-"/* =========================================\n"
-"   \u0413\u0420\u0423\u041f\u041f\u042b \u041f\u0410\u0420\u0410\u041c\u0415\u0422\u0420\u041e\u0412 (QGroupBox)\n"
-"   ========================================= */\n"
-"QGroupBox {\n"
-"    border: 1px solid #555555;\n"
-"    border-radius: 6px;\n"
-"    margin-top: 1.2em; /* \u041e\u0442\u0441\u0442\u0443\u043f \u0441\u0432\u0435\u0440\u0445\u0443, \u0447\u0442\u043e\u0431\u044b \u0437\u0430\u0433\u043e\u043b\u043e\u0432\u043e\u043a \u043d\u0435 \u043d\u0430\u0435\u0437\u0436\u0430\u043b \u043d\u0430 \u0440\u0430\u043c\u043a\u0443 */\n"
-"    padding-top: 10px;\n"
-"}\n"
-"\n"
-"QGroupBox::"
-                        "title {\n"
-"    subcontrol-origin: margin;\n"
-"    subcontrol-position: top left;\n"
-"    padding: 0 8px;\n"
-"    color: #4da6ff; /* \u0418\u043d\u0436\u0435\u043d\u0435\u0440\u043d\u044b\u0439 \u0441\u0438\u043d\u0438\u0439 \u0430\u043a\u0446\u0435\u043d\u0442 */\n"
-"    font-weight: bold;\n"
-"}\n"
-"\n"
-"/* =========================================\n"
-"   \u041f\u041e\u041b\u042f \u0412\u0412\u041e\u0414\u0410 (SpinBoxes)\n"
-"   ========================================= */\n"
-"QSpinBox, QDoubleSpinBox {\n"
-"    background-color: #3c3f41;\n"
-"    border: 1px solid #555555;\n"
-"    border-radius: 4px;\n"
-"    padding: 4px;\n"
-"    color: #ffffff;\n"
-"    min-width: 60px;\n"
-"}\n"
-"\n"
-"QSpinBox:focus, QDoubleSpinBox:focus {\n"
-"    border: 1px solid #4da6ff; /* \u0421\u0438\u043d\u044f\u044f \u043f\u043e\u0434\u0441\u0432\u0435\u0442\u043a\u0430 \u043f\u0440\u0438 \u0432\u0432\u043e\u0434\u0435 \u0441 \u043a\u043b\u0430\u0432\u0438\u0430\u0442\u0443\u0440\u044b */\n"
-"    background-color: #45494a;\n"
-"}\n"
-"\n"
-""
-                        "/* \u0421\u0442\u0438\u043b\u0438\u0437\u0430\u0446\u0438\u044f \u0441\u0442\u0440\u0435\u043b\u043e\u0447\u0435\u043a \u0432\u0432\u0435\u0440\u0445/\u0432\u043d\u0438\u0437 */\n"
-"QSpinBox::up-button, QDoubleSpinBox::up-button,\n"
-"QSpinBox::down-button, QDoubleSpinBox::down-button {\n"
-"    background-color: #45494a;\n"
-"    border-left: 1px solid #555555;\n"
-"    width: 20px;\n"
-"}\n"
-"\n"
-"QSpinBox::up-button:hover, QDoubleSpinBox::up-button:hover,\n"
-"QSpinBox::down-button:hover, QDoubleSpinBox::down-button:hover {\n"
-"    background-color: #54585a;\n"
-"}\n"
-"\n"
-"/* =========================================\n"
-"   \u0422\u0410\u0411\u041b\u0418\u0426\u0410 \u0421\u041e\u0420\u0422\u0410\u041c\u0415\u041d\u0422\u0410 (QTableWidget)\n"
-"   ========================================= */\n"
-"QTableWidget {\n"
-"    background-color: #1e1e1e;\n"
-"    alternate-background-color: #2a2d2e; /* \u0426\u0432\u0435\u0442 \u0434\u043b\u044f \"\u0437\u0435\u0431\u0440\u044b\" (\u0447\u0435\u0442\u043d\u044b\u0435 \u0441"
-                        "\u0442\u0440\u043e\u043a\u0438) */\n"
-"    color: #e0e0e0;\n"
-"    gridline-color: #3c3f41;\n"
-"    border: 1px solid #555555;\n"
-"    border-radius: 4px;\n"
-"    outline: none; /* \u0423\u0431\u0438\u0440\u0430\u0435\u0442 \u043f\u0443\u043d\u043a\u0442\u0438\u0440\u043d\u0443\u044e \u0440\u0430\u043c\u043a\u0443 \u0444\u043e\u043a\u0443\u0441\u0430 */\n"
-"}\n"
-"\n"
-"QTableWidget::item {\n"
-"    padding: 4px;\n"
-"}\n"
-"\n"
-"QTableWidget::item:hover {\n"
-"    background-color: #353839; /* \u041b\u0435\u0433\u043a\u0430\u044f \u043f\u043e\u0434\u0441\u0432\u0435\u0442\u043a\u0430 \u043f\u0440\u0438 \u043d\u0430\u0432\u0435\u0434\u0435\u043d\u0438\u0438 */\n"
-"}\n"
-"\n"
-"QTableWidget::item:selected {\n"
-"    background-color: #007ACC; /* \u0413\u043b\u0443\u0431\u043e\u043a\u0438\u0439 \u0441\u0438\u043d\u0438\u0439 \u043f\u0440\u0438 \u0432\u044b\u0431\u043e\u0440\u0435 \u043f\u0440\u043e\u0444\u0438\u043b\u044f */\n"
-"    color: white;\n"
-"    font-weight: bold;\n"
-"}\n"
-"\n"
-"/* \u0417\u0430\u0433\u043e\u043b"
-                        "\u043e\u0432\u043a\u0438 \u0441\u0442\u043e\u043b\u0431\u0446\u043e\u0432 \u0442\u0430\u0431\u043b\u0438\u0446\u044b */\n"
-"QHeaderView::section {\n"
-"    background-color: #3c3f41;\n"
-"    color: #ffffff;\n"
-"    padding: 6px;\n"
-"    border: 1px solid #555555;\n"
-"    border-top: none;\n"
-"    border-left: none;\n"
-"    font-weight: bold;\n"
-"    font-size: 9pt;\n"
-"}\n"
-"\n"
-"QHeaderView::section:hover {\n"
-"    background-color: #54585a;\n"
-"}\n"
-"\n"
-"/* \u041a\u0432\u0430\u0434\u0440\u0430\u0442\u0438\u043a \u0432 \u043b\u0435\u0432\u043e\u043c \u0432\u0435\u0440\u0445\u043d\u0435\u043c \u0443\u0433\u043b\u0443 \u0442\u0430\u0431\u043b\u0438\u0446\u044b */\n"
-"QTableCornerButton::section {\n"
-"    background-color: #3c3f41;\n"
-"    border: 1px solid #555555;\n"
-"}\n"
-"\n"
-"/* =========================================\n"
-"   \u041a\u041d\u041e\u041f\u041a\u0418 (QPushButton)\n"
-"   ========================================= */\n"
-"QPushButton {\n"
-"    background-color: #45494a;\n"
-"    border: 1px solid #"
-                        "555555;\n"
-"    border-radius: 4px;\n"
-"    padding: 8px 15px;\n"
-"    color: #e0e0e0;\n"
-"}\n"
-"\n"
-"QPushButton:hover {\n"
-"    background-color: #54585a;\n"
-"    border: 1px solid #777777;\n"
-"}\n"
-"\n"
-"QPushButton:pressed {\n"
-"    background-color: #3c3f41;\n"
-"}\n"
-"\n"
-"/* \u0421\u043f\u0435\u0446. \u0441\u0442\u0438\u043b\u044c \u0434\u043b\u044f \u043a\u043d\u043e\u043f\u043a\u0438 \"\u0417\u0430\u043f\u0443\u0441\u0442\u0438\u0442\u044c\" */\n"
-"QPushButton#btn_run {\n"
-"    background-color: #2b7041; /* \u0421\u043f\u043e\u043a\u043e\u0439\u043d\u044b\u0439 \u0437\u0435\u043b\u0435\u043d\u044b\u0439 */\n"
-"    border: 1px solid #3d9e5a;\n"
-"    color: white;\n"
-"    font-size: 11pt;\n"
-"}\n"
-"\n"
-"QPushButton#btn_run:hover {\n"
-"    background-color: #358c51;\n"
-"}\n"
-"\n"
-"QPushButton#btn_run:pressed {\n"
-"    background-color: #1f5230;\n"
-"}\n"
-"\n"
-"/* \u0421\u043f\u0435\u0446. \u0441\u0442\u0438\u043b\u044c \u0434\u043b\u044f \u043a\u043d\u043e\u043f\u043a\u0438 \"\u0421\u0442\u043e\u043f\" */\n"
-""
-                        "QPushButton#btn_stop {\n"
-"    background-color: #8c3d3d; /* \u0421\u043f\u043e\u043a\u043e\u0439\u043d\u044b\u0439 \u043a\u0440\u0430\u0441\u043d\u044b\u0439 */\n"
-"    border: 1px solid #a64d4d;\n"
-"    color: white;\n"
-"}\n"
-"\n"
-"QPushButton#btn_stop:hover {\n"
-"    background-color: #a64d4d;\n"
-"}\n"
-"\n"
-"QPushButton#btn_stop:pressed {\n"
-"    background-color: #5c2828;\n"
-"}\n"
-"\n"
-"/* =========================================\n"
-"   \u0428\u041a\u0410\u041b\u0410 \u041f\u0420\u041e\u0413\u0420\u0415\u0421\u0421\u0410 (QProgressBar)\n"
-"   ========================================= */\n"
-"QProgressBar {\n"
-"    border: 1px solid #555555;\n"
-"    border-radius: 4px;\n"
-"    text-align: center;\n"
-"    background-color: #1e1e1e;\n"
-"    color: white;\n"
-"    font-weight: bold;\n"
-"    min-height: 20px;\n"
-"}\n"
-"\n"
-"QProgressBar::chunk {\n"
-"    background-color: qlineargradient(spread:pad, x1:0, y1:0, x2:1, y2:0, stop:0 #007ACC, stop:1 #4da6ff);\n"
-"    border-radius: 3px;\n"
-"}\n"
-"\n"
-"/* ============"
-                        "=============================\n"
-"   \u0422\u0415\u0420\u041c\u0418\u041d\u0410\u041b \u041b\u041e\u0413\u041e\u0412 (QTextEdit)\n"
-"   ========================================= */\n"
-"QTextEdit#log_output {\n"
-"    background-color: #121212; /* \u0427\u0435\u0440\u043d\u044b\u0439 \u0444\u043e\u043d \u043a\u0430\u043a \u0432 \u043d\u0430\u0441\u0442\u043e\u044f\u0449\u0435\u043c \u0442\u0435\u0440\u043c\u0438\u043d\u0430\u043b\u0435 */\n"
-"    color: #a9b7c6; /* \u0426\u0432\u0435\u0442 \u0442\u0435\u043a\u0441\u0442\u0430 \u043a\u0430\u043a \u0432 IDE */\n"
-"    font-family: \"Consolas\", \"Courier New\", monospace; /* \u0421\u0442\u0440\u043e\u0433\u043e \u043c\u043e\u043d\u043e\u0448\u0438\u0440\u0438\u043d\u043d\u044b\u0439 \u0448\u0440\u0438\u0444\u0442 */\n"
-"    font-size: 10pt;\n"
-"    border: 1px solid #555555;\n"
-"    border-radius: 4px;\n"
-"    padding: 8px;\n"
-"}")
+        MainWindow.setStyleSheet(u"\n"
+"/* --- \u041e\u0431\u0449\u0438\u0439 \u0444\u043e\u043d --- */\n"
+"QWidget { background-color: #2b2b2b; color: #e0e0e0; font-family: \"Segoe UI\"; font-size: 10pt; }\n"
+"QGroupBox { border: 1px solid #555555; border-radius: 6px; margin-top: 1.2em; padding-top: 10px; }\n"
+"QGroupBox::title { subcontrol-origin: margin; subcontrol-position: top left; padding: 0 8px; color: #4da6ff; font-weight: bold; }\n"
+"QSpinBox, QLineEdit { background-color: #3c3f41; border: 1px solid #555555; border-radius: 4px; padding: 4px; color: #ffffff; }\n"
+"QSpinBox:focus, QLineEdit:focus { border: 1px solid #4da6ff; }\n"
+"QPushButton { background-color: #45494a; border: 1px solid #555555; border-radius: 4px; padding: 8px 15px; color: #e0e0e0; }\n"
+"QPushButton#btn_run { background-color: #2b7041; border: 1px solid #3d9e5a; color: white; font-weight: bold; }\n"
+"QPushButton#btn_run:hover { background-color: #358c51; }\n"
+"QPushButton#btn_stop { background-color: #8c3d3d; border: 1px solid #a64d4d; color: white;}\n"
+"QTableWidget"
+                        " { background-color: #1e1e1e; alternate-background-color: #2a2d2e; gridline-color: #3c3f41; border: 1px solid #555555; }\n"
+"QHeaderView::section { background-color: #3c3f41; color: white; padding: 5px; font-weight: bold; border: 1px solid #555555; }\n"
+"QTextEdit#log_output { background-color: #121212; color: #a9b7c6; font-family: \"Consolas\", monospace; border: 1px solid #555555; }\n"
+"")
         self.centralwidget = QWidget(MainWindow)
         self.centralwidget.setObjectName(u"centralwidget")
         self.verticalLayout_main = QVBoxLayout(self.centralwidget)
@@ -232,287 +52,237 @@ class Ui_MainWindow(object):
         self.verticalLayout_left.setObjectName(u"verticalLayout_left")
         self.group_geometry = QGroupBox(self.centralwidget)
         self.group_geometry.setObjectName(u"group_geometry")
-        sizePolicy = QSizePolicy(QSizePolicy.Policy.Preferred, QSizePolicy.Policy.Fixed)
-        sizePolicy.setHorizontalStretch(0)
-        sizePolicy.setVerticalStretch(0)
-        sizePolicy.setHeightForWidth(self.group_geometry.sizePolicy().hasHeightForWidth())
-        self.group_geometry.setSizePolicy(sizePolicy)
-        self.group_geometry.setStyleSheet(u"QGroupBox {\n"
-"	margin: 0px;\n"
-"}")
-        self.gridLayout_geom = QGridLayout(self.group_geometry)
-        self.gridLayout_geom.setObjectName(u"gridLayout_geom")
-        self.label_height = QLabel(self.group_geometry)
-        self.label_height.setObjectName(u"label_height")
+        self.gridLayout = QGridLayout(self.group_geometry)
+        self.gridLayout.setObjectName(u"gridLayout")
+        self.lbl_geom_dl = QLabel(self.group_geometry)
+        self.lbl_geom_dl.setObjectName(u"lbl_geom_dl")
 
-        self.gridLayout_geom.addWidget(self.label_height, 0, 0, 1, 1)
+        self.gridLayout.addWidget(self.lbl_geom_dl, 0, 2, 1, 1)
 
-        self.sb_height = QDoubleSpinBox(self.group_geometry)
-        self.sb_height.setObjectName(u"sb_height")
-        self.sb_height.setMaximum(10000.000000000000000)
-        self.sb_height.setValue(1036.000000000000000)
+        self.lbl_geom_ds = QLabel(self.group_geometry)
+        self.lbl_geom_ds.setObjectName(u"lbl_geom_ds")
 
-        self.gridLayout_geom.addWidget(self.sb_height, 0, 1, 1, 1)
+        self.gridLayout.addWidget(self.lbl_geom_ds, 1, 0, 1, 1)
 
-        self.label_d_small = QLabel(self.group_geometry)
-        self.label_d_small.setObjectName(u"label_d_small")
+        self.lbl_geom_h = QLabel(self.group_geometry)
+        self.lbl_geom_h.setObjectName(u"lbl_geom_h")
 
-        self.gridLayout_geom.addWidget(self.label_d_small, 1, 0, 1, 1)
+        self.gridLayout.addWidget(self.lbl_geom_h, 0, 0, 1, 1)
 
-        self.sb_d_small = QDoubleSpinBox(self.group_geometry)
+        self.sb_d_small = QLineEdit(self.group_geometry)
         self.sb_d_small.setObjectName(u"sb_d_small")
-        self.sb_d_small.setMaximum(5000.000000000000000)
-        self.sb_d_small.setValue(1400.000000000000000)
 
-        self.gridLayout_geom.addWidget(self.sb_d_small, 1, 1, 1, 1)
+        self.gridLayout.addWidget(self.sb_d_small, 1, 1, 1, 1)
 
-        self.label_d_large = QLabel(self.group_geometry)
-        self.label_d_large.setObjectName(u"label_d_large")
+        self.sb_height = QLineEdit(self.group_geometry)
+        self.sb_height.setObjectName(u"sb_height")
 
-        self.gridLayout_geom.addWidget(self.label_d_large, 2, 0, 1, 1)
+        self.gridLayout.addWidget(self.sb_height, 0, 1, 1, 1)
 
-        self.sb_d_large = QDoubleSpinBox(self.group_geometry)
+        self.sb_d_large = QLineEdit(self.group_geometry)
         self.sb_d_large.setObjectName(u"sb_d_large")
-        self.sb_d_large.setMaximum(5000.000000000000000)
-        self.sb_d_large.setValue(1600.000000000000000)
 
-        self.gridLayout_geom.addWidget(self.sb_d_large, 2, 1, 1, 1)
+        self.gridLayout.addWidget(self.sb_d_large, 0, 3, 1, 1)
 
 
         self.verticalLayout_left.addWidget(self.group_geometry)
 
         self.group_material = QGroupBox(self.centralwidget)
         self.group_material.setObjectName(u"group_material")
-        sizePolicy.setHeightForWidth(self.group_material.sizePolicy().hasHeightForWidth())
-        self.group_material.setSizePolicy(sizePolicy)
-        self.group_material.setStyleSheet(u"QGroupBox {\n"
-"	margin: 0px;\n"
-"}")
-        self.formLayout_mat = QFormLayout(self.group_material)
-        self.formLayout_mat.setObjectName(u"formLayout_mat")
-        self.label_mat_name = QLabel(self.group_material)
-        self.label_mat_name.setObjectName(u"label_mat_name")
+        self.gridLayout_2 = QGridLayout(self.group_material)
+        self.gridLayout_2.setObjectName(u"gridLayout_2")
+        self.lbl_mat_name = QLabel(self.group_material)
+        self.lbl_mat_name.setObjectName(u"lbl_mat_name")
 
-        self.formLayout_mat.setWidget(0, QFormLayout.ItemRole.LabelRole, self.label_mat_name)
+        self.gridLayout_2.addWidget(self.lbl_mat_name, 0, 0, 1, 1)
 
         self.txt_mat_name = QLineEdit(self.group_material)
         self.txt_mat_name.setObjectName(u"txt_mat_name")
 
-        self.formLayout_mat.setWidget(0, QFormLayout.ItemRole.FieldRole, self.txt_mat_name)
+        self.gridLayout_2.addWidget(self.txt_mat_name, 0, 1, 1, 1)
 
-        self.label_mat_e = QLabel(self.group_material)
-        self.label_mat_e.setObjectName(u"label_mat_e")
-
-        self.formLayout_mat.setWidget(1, QFormLayout.ItemRole.LabelRole, self.label_mat_e)
-
-        self.sb_mat_e = QDoubleSpinBox(self.group_material)
+        self.sb_mat_e = QLineEdit(self.group_material)
         self.sb_mat_e.setObjectName(u"sb_mat_e")
-        self.sb_mat_e.setDecimals(0)
-        self.sb_mat_e.setMaximum(999999999999.000000000000000)
-        self.sb_mat_e.setValue(210000.000000000000000)
 
-        self.formLayout_mat.setWidget(1, QFormLayout.ItemRole.FieldRole, self.sb_mat_e)
+        self.gridLayout_2.addWidget(self.sb_mat_e, 1, 1, 1, 1)
 
-        self.label_mat_nu = QLabel(self.group_material)
-        self.label_mat_nu.setObjectName(u"label_mat_nu")
+        self.lbl_mat_nu = QLabel(self.group_material)
+        self.lbl_mat_nu.setObjectName(u"lbl_mat_nu")
 
-        self.formLayout_mat.setWidget(2, QFormLayout.ItemRole.LabelRole, self.label_mat_nu)
+        self.gridLayout_2.addWidget(self.lbl_mat_nu, 0, 2, 1, 1)
 
-        self.sb_mat_nu = QDoubleSpinBox(self.group_material)
+        self.lbl_mat_e = QLabel(self.group_material)
+        self.lbl_mat_e.setObjectName(u"lbl_mat_e")
+
+        self.gridLayout_2.addWidget(self.lbl_mat_e, 1, 0, 1, 1)
+
+        self.sb_mat_nu = QLineEdit(self.group_material)
         self.sb_mat_nu.setObjectName(u"sb_mat_nu")
-        self.sb_mat_nu.setMaximum(0.500000000000000)
-        self.sb_mat_nu.setSingleStep(0.010000000000000)
-        self.sb_mat_nu.setValue(0.300000000000000)
 
-        self.formLayout_mat.setWidget(2, QFormLayout.ItemRole.FieldRole, self.sb_mat_nu)
+        self.gridLayout_2.addWidget(self.sb_mat_nu, 0, 3, 1, 1)
 
-        self.label_mat_yield = QLabel(self.group_material)
-        self.label_mat_yield.setObjectName(u"label_mat_yield")
+        self.lbl_mat_density = QLabel(self.group_material)
+        self.lbl_mat_density.setObjectName(u"lbl_mat_density")
 
-        self.formLayout_mat.setWidget(3, QFormLayout.ItemRole.LabelRole, self.label_mat_yield)
+        self.gridLayout_2.addWidget(self.lbl_mat_density, 1, 2, 1, 1)
 
-        self.sb_mat_yield = QDoubleSpinBox(self.group_material)
-        self.sb_mat_yield.setObjectName(u"sb_mat_yield")
-        self.sb_mat_yield.setMaximum(1000000.000000000000000)
-        self.sb_mat_yield.setValue(250.000000000000000)
+        self.sb_mat_density = QLineEdit(self.group_material)
+        self.sb_mat_density.setObjectName(u"sb_mat_density")
 
-        self.formLayout_mat.setWidget(3, QFormLayout.ItemRole.FieldRole, self.sb_mat_yield)
+        self.gridLayout_2.addWidget(self.sb_mat_density, 1, 3, 1, 1)
 
 
         self.verticalLayout_left.addWidget(self.group_material)
+
+        self.group_loads = QGroupBox(self.centralwidget)
+        self.group_loads.setObjectName(u"group_loads")
+        self.form_loads = QFormLayout(self.group_loads)
+        self.form_loads.setObjectName(u"form_loads")
+        self.lbl_load_force = QLabel(self.group_loads)
+        self.lbl_load_force.setObjectName(u"lbl_load_force")
+
+        self.form_loads.setWidget(0, QFormLayout.ItemRole.LabelRole, self.lbl_load_force)
+
+        self.sb_load = QLineEdit(self.group_loads)
+        self.sb_load.setObjectName(u"sb_load")
+
+        self.form_loads.setWidget(0, QFormLayout.ItemRole.FieldRole, self.sb_load)
+
+
+        self.verticalLayout_left.addWidget(self.group_loads)
 
         self.horizontalLayout_ranges = QHBoxLayout()
         self.horizontalLayout_ranges.setObjectName(u"horizontalLayout_ranges")
         self.group_skin = QGroupBox(self.centralwidget)
         self.group_skin.setObjectName(u"group_skin")
-        sizePolicy1 = QSizePolicy(QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Fixed)
-        sizePolicy1.setHorizontalStretch(0)
-        sizePolicy1.setVerticalStretch(0)
-        sizePolicy1.setHeightForWidth(self.group_skin.sizePolicy().hasHeightForWidth())
-        self.group_skin.setSizePolicy(sizePolicy1)
-        self.group_skin.setStyleSheet(u"QGroupBox {\n"
-"	margin: 0px;\n"
-"}")
-        self.form_skin = QFormLayout(self.group_skin)
-        self.form_skin.setObjectName(u"form_skin")
-        self.label_t_min = QLabel(self.group_skin)
-        self.label_t_min.setObjectName(u"label_t_min")
-
-        self.form_skin.setWidget(0, QFormLayout.ItemRole.LabelRole, self.label_t_min)
-
-        self.sb_thick_min = QDoubleSpinBox(self.group_skin)
-        self.sb_thick_min.setObjectName(u"sb_thick_min")
-        self.sb_thick_min.setValue(0.500000000000000)
-
-        self.form_skin.setWidget(0, QFormLayout.ItemRole.FieldRole, self.sb_thick_min)
-
-        self.label_t_max = QLabel(self.group_skin)
-        self.label_t_max.setObjectName(u"label_t_max")
-
-        self.form_skin.setWidget(1, QFormLayout.ItemRole.LabelRole, self.label_t_max)
-
-        self.sb_thick_max = QDoubleSpinBox(self.group_skin)
+        self.gridLayout_3 = QGridLayout(self.group_skin)
+        self.gridLayout_3.setObjectName(u"gridLayout_3")
+        self.sb_thick_max = QLineEdit(self.group_skin)
         self.sb_thick_max.setObjectName(u"sb_thick_max")
-        self.sb_thick_max.setValue(2.000000000000000)
 
-        self.form_skin.setWidget(1, QFormLayout.ItemRole.FieldRole, self.sb_thick_max)
+        self.gridLayout_3.addWidget(self.sb_thick_max, 1, 1, 1, 1)
 
-        self.label_t_step = QLabel(self.group_skin)
-        self.label_t_step.setObjectName(u"label_t_step")
+        self.sb_thick_min = QLineEdit(self.group_skin)
+        self.sb_thick_min.setObjectName(u"sb_thick_min")
 
-        self.form_skin.setWidget(2, QFormLayout.ItemRole.LabelRole, self.label_t_step)
+        self.gridLayout_3.addWidget(self.sb_thick_min, 0, 1, 1, 1)
 
-        self.sb_thick_step = QDoubleSpinBox(self.group_skin)
+        self.lbl_skin_max = QLabel(self.group_skin)
+        self.lbl_skin_max.setObjectName(u"lbl_skin_max")
+
+        self.gridLayout_3.addWidget(self.lbl_skin_max, 1, 0, 1, 1)
+
+        self.lbl_skin_min = QLabel(self.group_skin)
+        self.lbl_skin_min.setObjectName(u"lbl_skin_min")
+
+        self.gridLayout_3.addWidget(self.lbl_skin_min, 0, 0, 1, 1)
+
+        self.lbl_skin_step = QLabel(self.group_skin)
+        self.lbl_skin_step.setObjectName(u"lbl_skin_step")
+
+        self.gridLayout_3.addWidget(self.lbl_skin_step, 0, 2, 1, 1)
+
+        self.sb_thick_step = QLineEdit(self.group_skin)
         self.sb_thick_step.setObjectName(u"sb_thick_step")
-        self.sb_thick_step.setValue(0.100000000000000)
 
-        self.form_skin.setWidget(2, QFormLayout.ItemRole.FieldRole, self.sb_thick_step)
+        self.gridLayout_3.addWidget(self.sb_thick_step, 0, 3, 1, 1)
 
 
         self.horizontalLayout_ranges.addWidget(self.group_skin)
 
         self.group_stringers = QGroupBox(self.centralwidget)
         self.group_stringers.setObjectName(u"group_stringers")
-        sizePolicy1.setHeightForWidth(self.group_stringers.sizePolicy().hasHeightForWidth())
-        self.group_stringers.setSizePolicy(sizePolicy1)
-        self.group_stringers.setStyleSheet(u"QGroupBox {\n"
-"	margin: 0px;\n"
-"}")
-        self.form_stringers = QFormLayout(self.group_stringers)
-        self.form_stringers.setObjectName(u"form_stringers")
-        self.label_str_min = QLabel(self.group_stringers)
-        self.label_str_min.setObjectName(u"label_str_min")
+        self.gridLayout_4 = QGridLayout(self.group_stringers)
+        self.gridLayout_4.setObjectName(u"gridLayout_4")
+        self.lbl_str_min = QLabel(self.group_stringers)
+        self.lbl_str_min.setObjectName(u"lbl_str_min")
 
-        self.form_stringers.setWidget(0, QFormLayout.ItemRole.LabelRole, self.label_str_min)
+        self.gridLayout_4.addWidget(self.lbl_str_min, 0, 0, 1, 1)
+
+        self.sb_str_max = QSpinBox(self.group_stringers)
+        self.sb_str_max.setObjectName(u"sb_str_max")
+        self.sb_str_max.setMaximum(500)
+        self.sb_str_max.setValue(80)
+
+        self.gridLayout_4.addWidget(self.sb_str_max, 1, 1, 1, 1)
+
+        self.lbl_str_max = QLabel(self.group_stringers)
+        self.lbl_str_max.setObjectName(u"lbl_str_max")
+
+        self.gridLayout_4.addWidget(self.lbl_str_max, 1, 0, 1, 1)
 
         self.sb_str_min = QSpinBox(self.group_stringers)
         self.sb_str_min.setObjectName(u"sb_str_min")
         self.sb_str_min.setMaximum(500)
         self.sb_str_min.setValue(40)
 
-        self.form_stringers.setWidget(0, QFormLayout.ItemRole.FieldRole, self.sb_str_min)
+        self.gridLayout_4.addWidget(self.sb_str_min, 0, 1, 1, 1)
 
-        self.label_str_max = QLabel(self.group_stringers)
-        self.label_str_max.setObjectName(u"label_str_max")
+        self.lbl_str_eb = QLabel(self.group_stringers)
+        self.lbl_str_eb.setObjectName(u"lbl_str_eb")
 
-        self.form_stringers.setWidget(1, QFormLayout.ItemRole.LabelRole, self.label_str_max)
+        self.gridLayout_4.addWidget(self.lbl_str_eb, 0, 2, 1, 1)
 
-        self.sb_str_max = QSpinBox(self.group_stringers)
-        self.sb_str_max.setObjectName(u"sb_str_max")
-        self.sb_str_max.setMaximum(500)
-        self.sb_str_max.setValue(120)
+        self.sb_elements_between = QSpinBox(self.group_stringers)
+        self.sb_elements_between.setObjectName(u"sb_elements_between")
+        self.sb_elements_between.setValue(2)
 
-        self.form_stringers.setWidget(1, QFormLayout.ItemRole.FieldRole, self.sb_str_max)
+        self.gridLayout_4.addWidget(self.sb_elements_between, 0, 3, 1, 1)
 
-        self.label_str_step = QLabel(self.group_stringers)
-        self.label_str_step.setObjectName(u"label_str_step")
+        self.lbl_str_along = QLabel(self.group_stringers)
+        self.lbl_str_along.setObjectName(u"lbl_str_along")
 
-        self.form_stringers.setWidget(2, QFormLayout.ItemRole.LabelRole, self.label_str_step)
+        self.gridLayout_4.addWidget(self.lbl_str_along, 1, 2, 1, 1)
 
-        self.sb_str_step = QSpinBox(self.group_stringers)
-        self.sb_str_step.setObjectName(u"sb_str_step")
-        self.sb_str_step.setValue(10)
+        self.sb_str_along = QSpinBox(self.group_stringers)
+        self.sb_str_along.setObjectName(u"sb_str_along")
 
-        self.form_stringers.setWidget(2, QFormLayout.ItemRole.FieldRole, self.sb_str_step)
+        self.gridLayout_4.addWidget(self.sb_str_along, 1, 3, 1, 1)
 
 
         self.horizontalLayout_ranges.addWidget(self.group_stringers)
 
+        self.horizontalLayout_ranges.setStretch(0, 1)
+        self.horizontalLayout_ranges.setStretch(1, 1)
 
         self.verticalLayout_left.addLayout(self.horizontalLayout_ranges)
 
         self.group_assortment = QGroupBox(self.centralwidget)
         self.group_assortment.setObjectName(u"group_assortment")
-        self.group_assortment.setStyleSheet(u"QGroupBox {\n"
-"	margin: 0px;\n"
-"}")
-        self.verticalLayout_list = QVBoxLayout(self.group_assortment)
-        self.verticalLayout_list.setObjectName(u"verticalLayout_list")
+        self.vboxLayout = QVBoxLayout(self.group_assortment)
+        self.vboxLayout.setObjectName(u"vboxLayout")
         self.table_profiles = QTableWidget(self.group_assortment)
-        if (self.table_profiles.columnCount() < 8):
-            self.table_profiles.setColumnCount(8)
-        __qtablewidgetitem = QTableWidgetItem()
-        self.table_profiles.setHorizontalHeaderItem(0, __qtablewidgetitem)
-        __qtablewidgetitem1 = QTableWidgetItem()
-        self.table_profiles.setHorizontalHeaderItem(1, __qtablewidgetitem1)
-        __qtablewidgetitem2 = QTableWidgetItem()
-        self.table_profiles.setHorizontalHeaderItem(2, __qtablewidgetitem2)
-        __qtablewidgetitem3 = QTableWidgetItem()
-        self.table_profiles.setHorizontalHeaderItem(3, __qtablewidgetitem3)
-        __qtablewidgetitem4 = QTableWidgetItem()
-        self.table_profiles.setHorizontalHeaderItem(4, __qtablewidgetitem4)
-        __qtablewidgetitem5 = QTableWidgetItem()
-        self.table_profiles.setHorizontalHeaderItem(5, __qtablewidgetitem5)
-        __qtablewidgetitem6 = QTableWidgetItem()
-        self.table_profiles.setHorizontalHeaderItem(6, __qtablewidgetitem6)
-        __qtablewidgetitem7 = QTableWidgetItem()
-        self.table_profiles.setHorizontalHeaderItem(7, __qtablewidgetitem7)
         self.table_profiles.setObjectName(u"table_profiles")
 
-        self.verticalLayout_list.addWidget(self.table_profiles)
+        self.vboxLayout.addWidget(self.table_profiles)
 
 
         self.verticalLayout_left.addWidget(self.group_assortment)
 
-        self.horizontalLayout_buttons = QHBoxLayout()
-        self.horizontalLayout_buttons.setObjectName(u"horizontalLayout_buttons")
+        self.hboxLayout = QHBoxLayout()
+        self.hboxLayout.setObjectName(u"hboxLayout")
         self.horizontalSpacer = QSpacerItem(40, 20, QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Minimum)
 
-        self.horizontalLayout_buttons.addItem(self.horizontalSpacer)
+        self.hboxLayout.addItem(self.horizontalSpacer)
 
         self.btn_run = QPushButton(self.centralwidget)
         self.btn_run.setObjectName(u"btn_run")
-        sizePolicy2 = QSizePolicy(QSizePolicy.Policy.Minimum, QSizePolicy.Policy.Minimum)
-        sizePolicy2.setHorizontalStretch(0)
-        sizePolicy2.setVerticalStretch(0)
-        sizePolicy2.setHeightForWidth(self.btn_run.sizePolicy().hasHeightForWidth())
-        self.btn_run.setSizePolicy(sizePolicy2)
-        self.btn_run.setMinimumSize(QSize(0, 0))
-        self.btn_run.setMaximumSize(QSize(16777215, 30))
 
-        self.horizontalLayout_buttons.addWidget(self.btn_run)
+        self.hboxLayout.addWidget(self.btn_run)
 
         self.btn_stop = QPushButton(self.centralwidget)
         self.btn_stop.setObjectName(u"btn_stop")
-        self.btn_stop.setMaximumSize(QSize(16777215, 30))
 
-        self.horizontalLayout_buttons.addWidget(self.btn_stop)
+        self.hboxLayout.addWidget(self.btn_stop)
 
 
-        self.verticalLayout_left.addLayout(self.horizontalLayout_buttons)
+        self.verticalLayout_left.addLayout(self.hboxLayout)
 
         self.progressBar = QProgressBar(self.centralwidget)
         self.progressBar.setObjectName(u"progressBar")
-        self.progressBar.setValue(0)
 
         self.verticalLayout_left.addWidget(self.progressBar)
 
-        self.verticalLayout_left.setStretch(0, 1)
-        self.verticalLayout_left.setStretch(1, 1)
-        self.verticalLayout_left.setStretch(2, 2)
-        self.verticalLayout_left.setStretch(3, 1)
-        self.verticalLayout_left.setStretch(4, 1)
-        self.verticalLayout_left.setStretch(5, 1)
 
         self.horizontalLayout_top.addLayout(self.verticalLayout_left)
 
@@ -522,14 +292,12 @@ class Ui_MainWindow(object):
         self.horizontalLayout_top.addLayout(self.layout_plot)
 
         self.horizontalLayout_top.setStretch(0, 1)
-        self.horizontalLayout_top.setStretch(1, 1)
+        self.horizontalLayout_top.setStretch(1, 2)
 
         self.verticalLayout_main.addLayout(self.horizontalLayout_top)
 
         self.log_output = QTextEdit(self.centralwidget)
         self.log_output.setObjectName(u"log_output")
-        self.log_output.setMaximumSize(QSize(16777215, 150))
-        self.log_output.setReadOnly(True)
 
         self.verticalLayout_main.addWidget(self.log_output)
 
@@ -541,45 +309,40 @@ class Ui_MainWindow(object):
     # setupUi
 
     def retranslateUi(self, MainWindow):
-        MainWindow.setWindowTitle(QCoreApplication.translate("MainWindow", u"RocketShell Optimizer - \u0420\u0430\u0441\u0447\u0435\u0442 \u043a\u043e\u043d\u0438\u0447\u0435\u0441\u043a\u0438\u0445 \u043e\u0442\u0441\u0435\u043a\u043e\u0432", None))
-        self.group_geometry.setTitle(QCoreApplication.translate("MainWindow", u"\u0413\u0435\u043e\u043c\u0435\u0442\u0440\u0438\u044f \u0443\u0441\u0435\u0447\u0435\u043d\u043d\u043e\u0433\u043e \u043a\u043e\u043d\u0443\u0441\u0430 (\u043c\u043c)", None))
-        self.label_height.setText(QCoreApplication.translate("MainWindow", u"\u0412\u044b\u0441\u043e\u0442\u0430 (H):", None))
-        self.label_d_small.setText(QCoreApplication.translate("MainWindow", u"\u041c\u0430\u043b\u044b\u0439 \u0434\u0438\u0430\u043c. (d):", None))
-        self.label_d_large.setText(QCoreApplication.translate("MainWindow", u"\u0411\u043e\u043b\u044c\u0448\u0438\u0439 \u0434\u0438\u0430\u043c. (D):", None))
-        self.group_material.setTitle(QCoreApplication.translate("MainWindow", u"\u0421\u0432\u043e\u0439\u0441\u0442\u0432\u0430 \u043c\u0430\u0442\u0435\u0440\u0438\u0430\u043b\u0430", None))
-        self.label_mat_name.setText(QCoreApplication.translate("MainWindow", u"\u041d\u0430\u0437\u0432\u0430\u043d\u0438\u0435:", None))
-        self.txt_mat_name.setText(QCoreApplication.translate("MainWindow", u"Steel_Standard", None))
-        self.label_mat_e.setText(QCoreApplication.translate("MainWindow", u"E (\u041c\u041f\u0430):", None))
-        self.label_mat_nu.setText(QCoreApplication.translate("MainWindow", u"\u041a\u043e\u044d\u0444. \u041f\u0443\u0430\u0441\u0441\u043e\u043d\u0430:", None))
-        self.label_mat_yield.setText(QCoreApplication.translate("MainWindow", u"Sigma_y (\u041c\u041f\u0430):", None))
+        MainWindow.setWindowTitle(QCoreApplication.translate("MainWindow", u"RocketShell Optimizer", None))
+        self.group_geometry.setTitle(QCoreApplication.translate("MainWindow", u"\u0413\u0435\u043e\u043c\u0435\u0442\u0440\u0438\u044f \u043a\u043e\u043d\u0443\u0441\u0430 (\u043c\u043c)", None))
+        self.lbl_geom_dl.setText(QCoreApplication.translate("MainWindow", u"\u0411\u043e\u043b\u044c\u0448\u0438\u0439 \u0434\u0438\u0430\u043c. (D):", None))
+        self.lbl_geom_ds.setText(QCoreApplication.translate("MainWindow", u"\u041c\u0430\u043b\u044b\u0439 \u0434\u0438\u0430\u043c. (d):", None))
+        self.lbl_geom_h.setText(QCoreApplication.translate("MainWindow", u"\u0412\u044b\u0441\u043e\u0442\u0430 (H):", None))
+        self.sb_d_small.setText(QCoreApplication.translate("MainWindow", u"1400.0", None))
+        self.sb_height.setText(QCoreApplication.translate("MainWindow", u"1036.0", None))
+        self.sb_d_large.setText(QCoreApplication.translate("MainWindow", u"1600.0", None))
+        self.group_material.setTitle(QCoreApplication.translate("MainWindow", u"\u041c\u0430\u0442\u0435\u0440\u0438\u0430\u043b", None))
+        self.lbl_mat_name.setText(QCoreApplication.translate("MainWindow", u"\u041d\u0430\u0437\u0432\u0430\u043d\u0438\u0435:", None))
+        self.txt_mat_name.setText(QCoreApplication.translate("MainWindow", u"Steel", None))
+        self.sb_mat_e.setText(QCoreApplication.translate("MainWindow", u"210000.0", None))
+        self.lbl_mat_nu.setText(QCoreApplication.translate("MainWindow", u"\u041a\u043e\u044d\u0444. \u041f\u0443\u0430\u0441\u0441\u043e\u043d\u0430:", None))
+        self.lbl_mat_e.setText(QCoreApplication.translate("MainWindow", u"E (\u041c\u041f\u0430):", None))
+        self.sb_mat_nu.setText(QCoreApplication.translate("MainWindow", u"0.3", None))
+        self.lbl_mat_density.setText(QCoreApplication.translate("MainWindow", u"\u041f\u043b\u043e\u0442\u043d\u043e\u0441\u0442\u044c:", None))
+        self.group_loads.setTitle(QCoreApplication.translate("MainWindow", u"\u041d\u0430\u0433\u0440\u0443\u0437\u043a\u0438", None))
+        self.lbl_load_force.setText(QCoreApplication.translate("MainWindow", u"\u041e\u0441\u0435\u0432\u0430\u044f \u0441\u0438\u043b\u0430 (\u041d):", None))
+        self.sb_load.setText(QCoreApplication.translate("MainWindow", u"-1000.0", None))
         self.group_skin.setTitle(QCoreApplication.translate("MainWindow", u"\u041e\u0431\u0448\u0438\u0432\u043a\u0430 (t, \u043c\u043c)", None))
-        self.label_t_min.setText(QCoreApplication.translate("MainWindow", u"\u041c\u0438\u043d:", None))
-        self.label_t_max.setText(QCoreApplication.translate("MainWindow", u"\u041c\u0430\u043a\u0441:", None))
-        self.label_t_step.setText(QCoreApplication.translate("MainWindow", u"\u0428\u0430\u0433:", None))
+        self.sb_thick_max.setText(QCoreApplication.translate("MainWindow", u"2.0", None))
+        self.sb_thick_min.setText(QCoreApplication.translate("MainWindow", u"0.5", None))
+        self.lbl_skin_max.setText(QCoreApplication.translate("MainWindow", u"\u041c\u0430\u043a\u0441:", None))
+        self.lbl_skin_min.setText(QCoreApplication.translate("MainWindow", u"\u041c\u0438\u043d:", None))
+        self.lbl_skin_step.setText(QCoreApplication.translate("MainWindow", u"\u0428\u0430\u0433:", None))
+        self.sb_thick_step.setText(QCoreApplication.translate("MainWindow", u"0.5", None))
         self.group_stringers.setTitle(QCoreApplication.translate("MainWindow", u"\u0421\u0442\u0440\u0438\u043d\u0433\u0435\u0440\u044b (\u0428\u0442)", None))
-        self.label_str_min.setText(QCoreApplication.translate("MainWindow", u"\u041c\u0438\u043d:", None))
-        self.label_str_max.setText(QCoreApplication.translate("MainWindow", u"\u041c\u0430\u043a\u0441:", None))
-        self.label_str_step.setText(QCoreApplication.translate("MainWindow", u"\u0428\u0430\u0433:", None))
+        self.lbl_str_min.setText(QCoreApplication.translate("MainWindow", u"\u041c\u0438\u043d:", None))
+        self.lbl_str_max.setText(QCoreApplication.translate("MainWindow", u"\u041c\u0430\u043a\u0441:", None))
+        self.lbl_str_eb.setText(QCoreApplication.translate("MainWindow", u"\u041a\u042d \u043c\u0435\u0436\u0434\u0443:", None))
+        self.lbl_str_along.setText(QCoreApplication.translate("MainWindow", u"\u041a\u042d \u0432\u0434\u043e\u043b\u044c:", None))
         self.group_assortment.setTitle(QCoreApplication.translate("MainWindow", u"\u0421\u043e\u0440\u0442\u0430\u043c\u0435\u043d\u0442 \u043f\u0440\u043e\u0444\u0438\u043b\u0435\u0439", None))
-        ___qtablewidgetitem = self.table_profiles.horizontalHeaderItem(0)
-        ___qtablewidgetitem.setText(QCoreApplication.translate("MainWindow", u"\u2116", None));
-        ___qtablewidgetitem1 = self.table_profiles.horizontalHeaderItem(1)
-        ___qtablewidgetitem1.setText(QCoreApplication.translate("MainWindow", u"H, \u043c\u043c", None));
-        ___qtablewidgetitem2 = self.table_profiles.horizontalHeaderItem(2)
-        ___qtablewidgetitem2.setText(QCoreApplication.translate("MainWindow", u"B, \u043c\u043c", None));
-        ___qtablewidgetitem3 = self.table_profiles.horizontalHeaderItem(3)
-        ___qtablewidgetitem3.setText(QCoreApplication.translate("MainWindow", u"S, \u043c\u043c", None));
-        ___qtablewidgetitem4 = self.table_profiles.horizontalHeaderItem(4)
-        ___qtablewidgetitem4.setText(QCoreApplication.translate("MainWindow", u"S1, \u043c\u043c", None));
-        ___qtablewidgetitem5 = self.table_profiles.horizontalHeaderItem(5)
-        ___qtablewidgetitem5.setText(QCoreApplication.translate("MainWindow", u"S2, \u043c\u043c", None));
-        ___qtablewidgetitem6 = self.table_profiles.horizontalHeaderItem(6)
-        ___qtablewidgetitem6.setText(QCoreApplication.translate("MainWindow", u"S \u0441\u0435\u0447\u0435\u043d\u0438\u044f, \u043c\u043c^2", None));
-        ___qtablewidgetitem7 = self.table_profiles.horizontalHeaderItem(7)
-        ___qtablewidgetitem7.setText(QCoreApplication.translate("MainWindow", u"\u041c\u0430\u0441\u0441\u0430 1 \u043c, \u043a\u0433", None));
-        self.btn_run.setStyleSheet(QCoreApplication.translate("MainWindow", u"font-weight: bold; height: 40px;", None))
         self.btn_run.setText(QCoreApplication.translate("MainWindow", u"\u0417\u0430\u043f\u0443\u0441\u0442\u0438\u0442\u044c \u043e\u043f\u0442\u0438\u043c\u0438\u0437\u0430\u0446\u0438\u044e", None))
         self.btn_stop.setText(QCoreApplication.translate("MainWindow", u"\u0421\u0442\u043e\u043f", None))
-        self.log_output.setPlaceholderText(QCoreApplication.translate("MainWindow", u"\u041b\u043e\u0433 \u043f\u0440\u043e\u0446\u0435\u0441\u0441\u0430 \u0440\u0430\u0441\u0447\u0435\u0442\u043d\u043e\u0433\u043e \u044f\u0434\u0440\u0430 Nastran...", None))
+        self.log_output.setPlaceholderText(QCoreApplication.translate("MainWindow", u"\u041b\u043e\u0433 \u043f\u0440\u043e\u0446\u0435\u0441\u0441\u0430...", None))
     # retranslateUi
 
