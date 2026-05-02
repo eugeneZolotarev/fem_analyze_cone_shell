@@ -1,0 +1,66 @@
+INIT MASTER(S)
+NASTRAN SYSTEM(442)=-1,SYSTEM(319)=1
+ID opt,FEMAP
+SOL DESOPT
+CEND
+  ANALYSIS = STATICS
+  DESOBJ(MIN) = 2
+  DESSUB = 6
+  TITLE = Simcenter Nastran DesTopOpt Analysis Set
+  ECHO = PUNCH(BSTBULK)
+  DISPLACEMENT(PLOT) = ALL
+  SPCFORCE(PLOT) = ALL
+  OLOAD(PLOT) = ALL
+  FORCE(PLOT,CORNER) = ALL
+  STRESS(PLOT,CORNER) = ALL
+  SPC = 1
+  LOAD = 1
+SUBCASE 1
+  SUBTITLE = Static
+SUBCASE = 2
+ANALYSIS = BUCK
+METHOD = 1
+DESSUB = 2
+DISPLACEMENT(PLOT) = ALL
+STRESS(PLOT.CORNER) = ALL
+BEGIN BULK
+DOPTPRM,DESMAX,35,METHOD,3,GMAX,0.02,CONVDV,0.01,+
++,CONV1,0.01,CONVPR,0.01,APRCOD,3
+EIGRL          1     .01      6.       5       0                     MAX
+DRESP1,7000,R7000,LAMA,,,1
+DCONSTR,2,7000,1.0
+DRESP1,7001,R7001,LAMA,,,2
+DCONSTR,2,7001,1.0
+DRESP1,7002,R7002,LAMA,,,3
+DCONSTR,2,7002,1.0
+DRESP1,7003,R7003,LAMA,,,4
+DCONSTR,2,7003,1.0
+DRESP1,7004,R7004,LAMA,,,5
+DCONSTR,2,7004,1.0
+PARAM,NASPRT,2
+$ ***************************************************************************
+$   Written by : Femap
+$   Version    : 2021.2.1
+$   Translator : Simcenter Nastran
+$   From Model : C:\Users\4710707\Desktop\automatizationCalc\models\opt_1.modfem
+$   Date       : Wed Apr 29 23:53:02 2026
+$   Output To  : C:\Users\4710707\Desktop\automatizationCalc\models\
+$ ***************************************************************************
+$
+PARAM,PRGPST,NO
+PARAM,POST,-1
+PARAM,OGEOM,NO
+PARAM,AUTOSPC,YES
+PARAM,K6ROT,100.
+PARAM,GRDPNT,0
+DRESP1         2OBJECTIV  WEIGHT
+DESVAR, 1, FEMAP1, 2.0, {bottom_level_thickness_plate}, {top_level_thickness_plate}
+DVPREL1        1  PSHELL       1       T      1.      5.      0.        +
++              1      1.
+DCONADD        6       5
+DCONSTR, 5, 1, , {stress_limit_material}
+DRESP1         1     DO1  STRESS  PSHELL              11               1
+CORD2C         1       0      0.      0.      0.      0.      0.      1.+FEMAPC1
++FEMAPC1      1.      0.      1.
+CORD2S         2       0      0.      0.      0.      0.      0.      1.+FEMAPC2
++FEMAPC2      1.      0.      1.

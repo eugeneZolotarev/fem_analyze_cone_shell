@@ -1,14 +1,19 @@
 {
   "material": {
     "name": "Global_Steel",
-    "E": 2.1e11,
+    "E": 78e9,
     "nu": 0.3,
-    "rho": 7850.0
+    "rho": 2470.0
   },
   "properties": [
     {
-      "name": "Beam_Z_Section_100x50",
+      "type": "plate",
+      "name": "Cone_Shell_Property",
+      "thickness": 0.002
+    },
+    {
       "type": "beam_z",
+      "name": "Beam_Z_Section_100x50",
       "dimensions": {
         "h": 0.1,
         "w_top": 0.05,
@@ -17,27 +22,27 @@
         "t_bot": 0.005,
         "t_web": 0.005
       }
-    },
-    {
-      "name": "Cone_Shell_Property",
-      "type": "plate",
-      "thickness": 0.005
     }
   ],
   "geometry": {
-    "type": "truncated_cone",
-    "diameter_big": 2,
-    "diameter_small": 1,
-    "height": 1.5
+    "diameter_big": 1.507,
+    "diameter_small": 1.281,
+    "height": 1.036
   },
-  "mesh": {
-    "divisions_circular": 60,
-    "divisions_height": 10,
-    "stringers_count": 8
+  "loads": {
+    "axial_force": -700000.0
   },
   "tasks": [
     {
       "file_name": "cone_mapped_mesh.modfem"
     }
-  ]
+  ],
+  "database": {
+    "host": "localhost",
+    "port": 5432,
+    "name": "first_db",
+    "user": "postgres",
+    "password": "postgres"
+  },
+  "nastran_path": "D:\\Program Files\\Siemens\\nastran\\bin\\nastranw.exe"
 }
