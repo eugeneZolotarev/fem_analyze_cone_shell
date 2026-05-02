@@ -33,22 +33,26 @@ class OptimizationWorker(QThread):
             self.log_message.emit(f"Запуск оптимизации: {total_tasks} вариантов.")
             
             current_idx = 0
-            for s_idx, s_count in enumerate(stringer_counts):
-                for p_idx, raw_profile in enumerate(raw_profiles):
+            t_min_limit = float(self.params.get("ui_t_min", 1.0))
+
+            # ВНЕШНИЙ ЦИКЛ ПО ПРОФИЛЯМ
+            for p_idx, raw_profile in enumerate(raw_profiles):
+                p_name = raw_profile.get("Номер профиля", "Unknown")
+                
+                # ВНУТРЕННИЙ ЦИКЛ ПО ЧИСЛУ СТРИНГЕРОВ
+                for s_idx, s_count in enumerate(stringer_counts):
                     if not self._is_running: break
                     
                     current_idx += 1
                     start_time = time.time()
                     
-                    # Преобразуем формат профиля из JSON (с русскими ключами) в формат для Билдера
-                    p_name = raw_profile.get("Номер профиля", "Unknown")
                     profile_formatted = {
                         "name": f"Profile_{p_name}",
                         "type": "beam_z",
                         "dimensions": {
                             "h": float(raw_profile["H, мм"]),
                             "w_bot": float(raw_profile["B, мм"]),
-                            "w_top": float(raw_profile["B, мм"]), # Предполагаем равные полки
+                            "w_top": float(raw_profile["B, мм"]),
                             "t_bot": float(raw_profile["S, мм"]),
                             "t_web": float(raw_profile["S1, мм"]),
                             "t_top": float(raw_profile["S2, мм"])
@@ -64,17 +68,17 @@ class OptimizationWorker(QThread):
                             "divisions_height": self.params["elements_along"]
                         },
                         "plate_prop": {
-                            "name": "Shell", "type": "plate", "thickness": self.params["ui_t_min"]
+                            "name": "Shell", "type": "plate", "thickness": t_min_limit
                         },
                         "beam_prop": profile_formatted,
                         "optimization": {
-                            "t_min": self.params["ui_t_min"],
+                            "t_min": t_min_limit,
                             "t_max": self.params["ui_t_max"]
                         }
                     }
                     iter_params["geometry"]["stringer_count"] = s_count
 
-                    self.log_message.emit(f"Расчет {current_idx}/{total_tasks}: N={s_count}, Prof={p_name}")
+                    self.log_message.emit(f"Расчет {current_idx}/{total_tasks}: Prof={p_name}, N={s_count}")
                     
                     res = director.construct_and_solve(iter_params)
                     
@@ -109,6 +113,13 @@ class OptimizationWorker(QThread):
                             "profile_name": p_name
                         }
                         self.result_ready.emit(result_data)
+                        
+                        # --- ТРЮК: Если достигли t_min, бросаем этот профиль и идем к следующему ---
+                        if abs(t_opt - t_min_limit) < 1e-7:
+                            self.log_message.emit(f"Профиль {p_name}: толщина достигла минимума ({t_min_limit:.2f}). Остальные N для него пропускаются.")
+                            remaining_s = len(stringer_counts) - (s_idx + 1)
+                            current_idx += remaining_s
+                            break
                     
                     self.progress_updated.emit(int((current_idx / total_tasks) * 100))
                     
