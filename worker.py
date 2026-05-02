@@ -1,6 +1,7 @@
 import time
 import pythoncom
 import traceback
+import numpy as np
 from PySide6.QtCore import QThread, Signal
 from builders import ConeModelBuilder
 from director import OptimizationDirector
@@ -35,11 +36,8 @@ class OptimizationWorker(QThread):
             current_idx = 0
             t_min_limit = float(self.params.get("ui_t_min", 1.0))
 
-            # ВНЕШНИЙ ЦИКЛ ПО ПРОФИЛЯМ
             for p_idx, raw_profile in enumerate(raw_profiles):
                 p_name = raw_profile.get("Номер профиля", "Unknown")
-                
-                # ВНУТРЕННИЙ ЦИКЛ ПО ЧИСЛУ СТРИНГЕРОВ
                 for s_idx, s_count in enumerate(stringer_counts):
                     if not self._is_running: break
                     
@@ -84,15 +82,37 @@ class OptimizationWorker(QThread):
                     
                     if res:
                         t_opt = res.get("optimized_thickness", 0.0)
-                        sigma_y = float(self.params["material"]["yield"])
-                        plate_sf = sigma_y / res["max_stress"] if res["max_stress"] > 0 else 0
+                        mat = self.params["material"]
+                        E = float(mat["E"])
+                        nu = float(mat["nu"])
+                        rho = float(mat["rho"])
+                        sigma_y = float(mat["yield"])
                         
-                        E = float(self.params["material"]["E"])
+                        # 1. MS по текучести для оболочки (Plate)
+                        plate_max = res["max_stress"]
+                        plate_ms = (sigma_y / plate_max) - 1 if plate_max > 0 else 0
+                        
+                        # 2. MS по текучести для стрингеров (Beam)
+                        beam_max = abs(res["beam_max_stress"])
+                        beam_ms = (sigma_y / beam_max) - 1 if beam_max > 0 else 0
+                        
+                        # 3. MS местной устойчивости полки стрингера (Local Buckling)
                         d = profile_formatted["dimensions"]
-                        sigma_cr_flange = 0.46 * E * (d["t_top"] / d["w_top"])**2
+                        sigma_cr_flange = 0.46 * ((np.pi**2 * E) / (12 * (1 - nu**2))) * (d["t_top"] / d["w_top"])**2
+                        flange_buckling_ms = (sigma_cr_flange / beam_max) - 1 if beam_max > 0 else 0
+
+                        # Расчет массы
+                        g = self.params["geometry"]
+                        H = float(g["height"])
+                        R = float(g["diameter_big"]) / 2
+                        r = float(g["diameter_small"]) / 2
+                        L_cone = np.sqrt((R-r)**2 + H**2)
+                        Area_shell = np.pi * (R + r) * L_cone
                         
-                        beam_max = res["beam_max_stress"]
-                        flange_buckling_sf = min(sigma_cr_flange / beam_max, sigma_y / beam_max) if beam_max > 0 else 0
+                        # Площадь сечения стрингера из raw_profile в см2 -> мм2
+                        Area_stringer_mm2 = float(raw_profile["Площадь сечения, см2"]) * 100
+                        
+                        mass_kg = (Area_shell * t_opt * rho + s_count * Area_stringer_mm2 * L_cone * rho) * 1e-9
 
                         end_time = time.time()
                         
@@ -102,11 +122,13 @@ class OptimizationWorker(QThread):
                             "t": t_opt,
                             "n": s_count,
                             "profile": p_name,
-                            "max_stress": res["max_stress"],
-                            "beam_max_stress": res["beam_max_stress"],
+                            "max_stress": plate_max,
+                            "beam_max_stress": beam_max,
                             "eigenvalue": res["eigenvalue"],
-                            "plate_sf": plate_sf,
-                            "flange_buckling_sf": flange_buckling_sf,
+                            "plate_sf": plate_ms,
+                            "beam_sf": beam_ms,
+                            "flange_buckling_sf": flange_buckling_ms,
+                            "total_mass": mass_kg,
                             "difference_time": f"{int(end_time - start_time)}s",
                             "skin_thickness": t_opt,
                             "stringer_count": s_count,
@@ -114,9 +136,8 @@ class OptimizationWorker(QThread):
                         }
                         self.result_ready.emit(result_data)
                         
-                        # --- ТРЮК: Если достигли t_min, бросаем этот профиль и идем к следующему ---
                         if abs(t_opt - t_min_limit) < 1e-7:
-                            self.log_message.emit(f"Профиль {p_name}: толщина достигла минимума ({t_min_limit:.2f}). Остальные N для него пропускаются.")
+                            self.log_message.emit(f"Профиль {p_name}: t_min достигнут. Пропуск.")
                             remaining_s = len(stringer_counts) - (s_idx + 1)
                             current_idx += remaining_s
                             break
@@ -126,7 +147,7 @@ class OptimizationWorker(QThread):
             self.finished.emit()
             
         except Exception as e:
-            self.log_message.emit(f"Критическая ошибка: {e}")
+            self.log_message.emit(f"Ошибка: {e}")
             self.error_occurred.emit(str(e))
             traceback.print_exc()
         finally:

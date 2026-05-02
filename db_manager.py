@@ -41,6 +41,7 @@ class DatabaseManager(QObject):
                 beam_max_stress DOUBLE PRECISION,
                 flange_buckling_sf DOUBLE PRECISION,
                 plate_sf DOUBLE PRECISION,
+                beam_sf DOUBLE PRECISION,
                 status TEXT
             )
         """)
@@ -50,7 +51,8 @@ class DatabaseManager(QObject):
             ("total_mass", "DOUBLE PRECISION"),
             ("beam_max_stress", "DOUBLE PRECISION"),
             ("flange_buckling_sf", "DOUBLE PRECISION"),
-            ("plate_sf", "DOUBLE PRECISION")
+            ("plate_sf", "DOUBLE PRECISION"),
+            ("beam_sf", "DOUBLE PRECISION")
         ]
         for col, col_type in columns:
             check_q = f"SELECT 1 FROM information_schema.columns WHERE table_name='optimization_results' AND column_name='{col}'"
@@ -70,18 +72,19 @@ class DatabaseManager(QObject):
         query = QSqlQuery(self.db)
         query.prepare("""
             INSERT INTO optimization_results 
-            (skin_thickness, stringer_count, profile_number, max_stress, eigenvalue, total_mass, beam_max_stress, flange_buckling_sf, plate_sf, status)
-            VALUES (:t, :n, :p, :s, :e, :m, :bs, :fsf, :psf, :st)
+            (skin_thickness, stringer_count, profile_number, max_stress, eigenvalue, total_mass, beam_max_stress, flange_buckling_sf, plate_sf, beam_sf, status)
+            VALUES (:t, :n, :p, :s, :e, :m, :bs, :fsf, :psf, :bsf, :st)
         """)
         query.bindValue(":t", safe_f(data.get("t")))
         query.bindValue(":n", int(data.get("n", 0)))
         query.bindValue(":p", str(data.get("profile", "Unknown")))
         query.bindValue(":s", safe_f(data.get("max_stress")))
         query.bindValue(":e", safe_f(data.get("eigenvalue")))
-        query.bindValue(":m", safe_f(data.get("mass")))
+        query.bindValue(":m", safe_f(data.get("total_mass")))
         query.bindValue(":bs", safe_f(data.get("beam_max_stress")))
-        query.bindValue(":fsf", safe_f(data.get("flange_sf")))
-        query.bindValue(":psf", safe_f(data.get("plate_sf"))) # НОВОЕ ПОЛЕ
+        query.bindValue(":fsf", safe_f(data.get("flange_buckling_sf")))
+        query.bindValue(":psf", safe_f(data.get("plate_sf")))
+        query.bindValue(":bsf", safe_f(data.get("beam_sf")))
         query.bindValue(":st", str(data.get("status", "Success")))
         
         success = query.exec()
