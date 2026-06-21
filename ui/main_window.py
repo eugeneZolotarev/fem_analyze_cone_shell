@@ -6,6 +6,7 @@ from ui.ui_main_window import Ui_MainWindow
 import matplotlib.pyplot as plt
 from matplotlib.backends.backend_qtagg import FigureCanvasQTAgg as FigureCanvas
 from matplotlib.figure import Figure
+import matplotlib.patches as patches
 import numpy as np
 import os
 import json
@@ -97,14 +98,57 @@ class RocketApp(QMainWindow):
         self.draw_section(h=1.5, b_c=float(p.get("H, мм", 0)), c_c=float(p.get("S1, мм", 0)), b_nc=float(p.get("B, мм", 0)), title=f"Профиль №{p.get('Номер профиля')}")
 
     def draw_section(self, h, b_c, c_c, b_nc, title):
-        self.figure.clear(); ax = self.figure.add_subplot(111); ax.set_facecolor('white')
-        skin_width = b_nc * 3; skin_x, skin_y = [-skin_width/2, skin_width/2], [-h/2, -h/2]
-        lower_flange_x, lower_flange_y = [0, b_nc], [c_c/2, c_c/2]
-        web_x, web_y = [0, 0], [c_c/2, c_c/2+b_c]
-        upper_flange_x, upper_flange_y = [-b_nc, 0], [c_c/2+b_c, c_c/2+b_c]
-        scale_lw = 4
-        ax.plot(skin_x, skin_y, color="gray", lw=h*scale_lw, solid_capstyle="butt")
-        ax.plot(lower_flange_x, lower_flange_y, color="blue", lw=c_c*scale_lw, solid_capstyle="butt")
-        ax.plot(web_x, web_y, color="blue", lw=c_c*scale_lw, solid_capstyle="butt")
-        ax.plot(upper_flange_x, upper_flange_y, color="blue", lw=c_c*scale_lw, solid_capstyle="butt")
-        ax.set_aspect("equal"); ax.set_title(title); ax.grid(True, linestyle="--", alpha=0.3); self.figure.tight_layout(); self.canvas.draw()
+        self.figure.clear()
+        ax = self.figure.add_subplot(111)
+        ax.set_facecolor('white')
+
+        skin_width = b_nc * 3
+
+        # 1. Обшивка (Skin)
+        # Координаты левого нижнего угла: (-skin_width/2, -h), ширина: skin_width, высота: h
+        skin_rect = patches.Rectangle(
+            (-skin_width / 2, -h), skin_width, h,
+            facecolor="gray", edgecolor="black", zorder=1
+        )
+        ax.add_patch(skin_rect)
+
+        # 2. Нижняя полка (Lower flange)
+        # Идет от центра (0) вправо на b_nc. Высота равна c_c.
+        lower_flange = patches.Rectangle(
+            (0, 0), b_nc, c_c,
+            facecolor="blue", edgecolor="none", zorder=2
+        )
+        ax.add_patch(lower_flange)
+
+        # 3. Верхняя полка (Upper flange)
+        # Идет от левого края (-b_nc) до центра (0).
+        upper_flange = patches.Rectangle(
+            (-b_nc, b_c), b_nc, c_c,
+            facecolor="blue", edgecolor="none", zorder=2
+        )
+        ax.add_patch(upper_flange)
+
+        # 4. Стенка (Web)
+        # Центрирована по x=0, имеет толщину c_c.
+        # Высота: от низа нижней полки (0) до верха верхней полки (b_c + c_c).
+        web = patches.Rectangle(
+            (-c_c / 2, 0), c_c, b_c + c_c,
+            facecolor="blue", edgecolor="none", zorder=2
+        )
+        ax.add_patch(web)
+
+        # Настройки отображения
+        ax.set_aspect("equal")
+        ax.set_title(title)
+        ax.grid(True, linestyle="--", alpha=0.3)
+
+        # Важно: при использовании patches Matplotlib не вычисляет лимиты осей автоматически.
+        # Задаем их вручную с отступом в 10% для красоты.
+        margin_x = skin_width * 0.1
+        margin_y = (b_c + c_c + h) * 0.1
+
+        ax.set_xlim(-skin_width / 2 - margin_x, skin_width / 2 + margin_x)
+        ax.set_ylim(-h - margin_y, b_c + c_c + margin_y)
+
+        self.figure.tight_layout()
+        self.canvas.draw()

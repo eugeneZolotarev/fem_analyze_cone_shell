@@ -212,7 +212,7 @@ class Ui_MainWindow(object):
         self.sb_str_max = QSpinBox(self.group_stringers)
         self.sb_str_max.setObjectName(u"sb_str_max")
         self.sb_str_max.setMaximum(500)
-        self.sb_str_max.setValue(100)
+        self.sb_str_max.setValue(50)
 
         self.gridLayout_4.addWidget(self.sb_str_max, 1, 1, 1, 1)
 
@@ -240,13 +240,13 @@ class Ui_MainWindow(object):
 
         self.sb_elements_between = QSpinBox(self.group_stringers)
         self.sb_elements_between.setObjectName(u"sb_elements_between")
-        self.sb_elements_between.setValue(10)
+        self.sb_elements_between.setValue(12)
 
         self.gridLayout_4.addWidget(self.sb_elements_between, 0, 3, 1, 1)
 
         self.sb_str_along = QSpinBox(self.group_stringers)
         self.sb_str_along.setObjectName(u"sb_str_along")
-        self.sb_str_along.setValue(10)
+        self.sb_str_along.setValue(36)
 
         self.gridLayout_4.addWidget(self.sb_str_along, 1, 3, 1, 1)
 
@@ -257,7 +257,7 @@ class Ui_MainWindow(object):
 
         self.sb_str_step = QSpinBox(self.group_stringers)
         self.sb_str_step.setObjectName(u"sb_str_step")
-        self.sb_str_step.setValue(10)
+        self.sb_str_step.setValue(1)
 
         self.gridLayout_4.addWidget(self.sb_str_step, 0, 5, 1, 1)
 
@@ -347,12 +347,12 @@ class Ui_MainWindow(object):
         self.lbl_mat_nu.setText(QCoreApplication.translate("MainWindow", u"\u041a\u043e\u044d\u0444. \u041f\u0443\u0430\u0441\u0441\u043e\u043d\u0430:", None))
         self.sb_mat_e.setText(QCoreApplication.translate("MainWindow", u"78000.0", None))
         self.lbl_mat_density.setText(QCoreApplication.translate("MainWindow", u"\u041f\u043b\u043e\u0442\u043d\u043e\u0441\u0442\u044c:", None))
-        self.sb_mat_density.setText(QCoreApplication.translate("MainWindow", u"2470", None))
+        self.sb_mat_density.setText(QCoreApplication.translate("MainWindow", u"0.0000000027", None))
         self.lbl_mat_sigma.setText(QCoreApplication.translate("MainWindow", u"<html><head/><body><p>\u03c3 <span style=\" vertical-align:sub;\">\u0442</span> (\u041c\u041f\u0430)</p></body></html>", None))
         self.sb_mat_sigma.setText(QCoreApplication.translate("MainWindow", u"270.0", None))
         self.group_loads.setTitle(QCoreApplication.translate("MainWindow", u"\u041d\u0430\u0433\u0440\u0443\u0437\u043a\u0438", None))
         self.lbl_load_force.setText(QCoreApplication.translate("MainWindow", u"\u041e\u0441\u0435\u0432\u0430\u044f \u0441\u0438\u043b\u0430 (\u041d):", None))
-        self.sb_load.setText(QCoreApplication.translate("MainWindow", u"-700000.0", None))
+        self.sb_load.setText(QCoreApplication.translate("MainWindow", u"-645000.0", None))
         self.group_skin.setTitle(QCoreApplication.translate("MainWindow", u"\u041e\u0431\u0448\u0438\u0432\u043a\u0430 (t, \u043c\u043c)", None))
         self.sb_thick_max.setText(QCoreApplication.translate("MainWindow", u"5", None))
         self.sb_thick_min.setText(QCoreApplication.translate("MainWindow", u"1", None))

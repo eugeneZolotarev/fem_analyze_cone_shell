@@ -64,7 +64,11 @@ class OptimizationDirector:
             # 5. Считывание финальных результатов
             results = self.builder.read_results()
             results["optimized_thickness"] = opt_thickness
-            
+
+            """Отправляем массу конструкции"""
+            total_mass = self.builder.calculate_construction_mass()
+            results["total_mass"] = total_mass
+
             self.builder.configure_view()
             
             # 6. ОЧИСТКА (Выполняется перед return)

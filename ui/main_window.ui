@@ -145,7 +145,7 @@ QTextEdit#log_output { background-color: #121212; color: #a9b7c6; font-family: &
            <item row="1" column="3">
             <widget class="QLineEdit" name="sb_mat_density">
              <property name="text">
-              <string>2470</string>
+              <string>0.0000000027</string>
              </property>
             </widget>
            </item>
@@ -182,7 +182,7 @@ QTextEdit#log_output { background-color: #121212; color: #a9b7c6; font-family: &
            <item row="0" column="1">
             <widget class="QLineEdit" name="sb_load">
              <property name="text">
-              <string>-700000.0</string>
+              <string>-645000.0</string>
              </property>
             </widget>
            </item>
@@ -261,7 +261,7 @@ QTextEdit#log_output { background-color: #121212; color: #a9b7c6; font-family: &
                 <number>500</number>
                </property>
                <property name="value">
-                <number>100</number>
+                <number>50</number>
                </property>
               </widget>
              </item>
@@ -299,14 +299,14 @@ QTextEdit#log_output { background-color: #121212; color: #a9b7c6; font-family: &
              <item row="0" column="3">
               <widget class="QSpinBox" name="sb_elements_between">
                <property name="value">
-                <number>10</number>
+                <number>12</number>
                </property>
               </widget>
              </item>
              <item row="1" column="3">
               <widget class="QSpinBox" name="sb_str_along">
                <property name="value">
-                <number>10</number>
+                <number>36</number>
                </property>
               </widget>
              </item>
@@ -320,7 +320,7 @@ QTextEdit#log_output { background-color: #121212; color: #a9b7c6; font-family: &
              <item row="0" column="5">
               <widget class="QSpinBox" name="sb_str_step">
                <property name="value">
-                <number>10</number>
+                <number>1</number>
                </property>
               </widget>
              </item>
